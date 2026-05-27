@@ -3,7 +3,7 @@ This example shows connecting to the PN532 with I2C (requires clock
 stretching support), SPI, or UART. SPI is best, it uses the most pins but
 is the most reliable and universally supported.
 After initialization, try waving various 13.56MHz RFID cards over it!
-Modified and enhanced by Javier@Books etc. May/June 2025
+Modified and enhanced by habiwan in May/June 2025
 This example is to get an excel file file written with the codes and matching names so a number can be written on empty cards
 uses the production names.csv
 GOAL is to see the results after swiping a card and writing a little number in the corner with the unassigned card number for future employees / temps...
