@@ -1,11 +1,11 @@
 [Unit]
-# Human readable name of the unit
-Description=Javier Clocking System replacement script
+Description=PiClock Empty card assist tool
 After=multi-user.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/python /home/javier/nfc/emptycards.py
+Remember to adjust the paths!
+ExecStart=/usr/bin/python /home/habiwan/nfc/emptycards.py
 Restart=always
 
 [Install]
