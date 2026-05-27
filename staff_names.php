@@ -1,10 +1,14 @@
 <?php
-// Configuration
-$pi_ip = "192.168.1.199"; 
-$pi_user = "javier";
-$remote_file = "/home/javier/nfc/names.csv";
+// Configuration 
+// Remember to adjust the Pi IP address and user
+$pi_ip = "192.168.X.X"; 
+$pi_user = "habiwan";
+$remote_file = "/home/habiwan/nfc/names.csv";
 $local_tmp = "/tmp/names.csv";
-$ssh_key = "/var/www/html/.ssh/id_ed25519";
+// for the "UbuntuVM Docker LAMP machine" to be able to update names.csv on the Pi, I added a private key to root inside the docker machine
+// (I had to apt install sudo and openssh tools to he docker container manually first)
+$ssh_key = "/var/www/html/.ssh/id_ed25519"; // I added it to /var/www/html/.ssh (not recommended) but I just did not want to "recompose" the docker
+// ... on the other hand, is good enough, to get to this key you first need local access anyways, and it is not supposed to run on the Internet!
 
 $message = "";
 
