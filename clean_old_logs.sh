@@ -1,4 +1,6 @@
 #!/bin/bash
+# do sudo crontab -e to add it to nightly checks and trims of old data, e.g:
+# 0 2 * * * /bin/bash /home/javier/nfc/clean_old_logs.sh >/dev/null 2>&1
 
 TIMES_FILE="/home/javier/nfc/times.csv"
 
