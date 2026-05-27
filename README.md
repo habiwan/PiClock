@@ -5,10 +5,10 @@ Materials required:
  - Raspberry Pi2 (32bit) (when tested on Pi 4 or newer struggled as it's 64bit and too fast)
  - Pi2 PSU
  - Wifi dongle (Pi2 does not have wifi)
- - NFC HAT
- - LCD screen HAT
+ - NFC HAT (e.g. PN532 NFC HAT)
+ - LCD screen HAT (e.g. ELEGOO 3.5 Inch 480x320 TFT Display HAT)
  - mini speaker (buzzer)
- - 100x NFC cards (the box they came in is perfect size for building a case cutting off the front to reveal the LCD screen and a slot on the side to "swipe" the NFC cards)
+ - 100x NFC cards (NTag215 the box they came in is perfect size for building a case cutting off the front to reveal the LCD screen and a slot on the side to "swipe" the NFC cards)
 Steps:
 1. Install default Pi OS legacy 32 bit (bullseye)
 2. sudo raspi-config to enable SSH,SPI,i2c,GPIO etc...
