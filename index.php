@@ -55,7 +55,7 @@
     <div class="container">
         <header>
             <h1>'PiClock' NFC System</h1>
-            <p>custom made Punchcard-System for <b>BOOKS </b><small><i>etc.</i></small></p>
+            <p>custom made Punchcard-System replacement</p>
         </header>
                
         <div class="controls">
@@ -83,7 +83,7 @@
             </div>
         
         <div class="footer">
-            'PiClock' NFC Timestamp Viewer &copy; 2025-<?php echo date('Y');?> <a href="mailto:javier@booksetc.co.uk" style="color: #fff;">Javier Puig</a>
+            'PiClock' NFC Timestamp Viewer &copy; 2025-<?php echo date('Y');?> <a href="mailto:habiwan@me.com" style="color: #fff;">F. Javier "habiwan" Puig Diaz</a>
         </div>
     </div>
 
