@@ -1,0 +1,13 @@
+[Unit]
+Description=Sync NFC logs on times.csv modification
+After=network.target
+
+[Service]
+Type=simple
+User=javier
+ExecStart=/home/javier/nfc/sync_clocks.sh
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
