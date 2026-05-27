@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PiClock Dashboard</title>
+    <link rel="icon" href="favicon.svg">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background: linear-gradient(180deg, #1c3344, #102a33, #000000); min-height: 100vh; padding: 30px 20px; color: #fff; }
@@ -54,7 +55,7 @@
     <div class="container">
         <header>
             <h1>'PiClock' NFC System</h1>
-            <p>custom made Punchcard-System by F. Javier Puig Diaz</p>
+            <p>custom made Punchcard-System for <b>BOOKS </b><small><i>etc.</i></small></p>
         </header>
                
         <div class="controls">
@@ -82,7 +83,7 @@
             </div>
         
         <div class="footer">
-            'PiClock' NFC Timestamp Viewer &copy; 2025-<?php echo date('Y');?> <a href="mailto:habiwan@me.com" style="color: #fff;">F. Javier Puig Diaz</a>
+            'PiClock' NFC Timestamp Viewer &copy; 2025-<?php echo date('Y');?> <a href="mailto:javier@booksetc.co.uk" style="color: #fff;">Javier Puig</a>
         </div>
     </div>
 

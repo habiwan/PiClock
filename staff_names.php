@@ -63,6 +63,7 @@ if (($handle = fopen($local_tmp, "r")) !== FALSE) {
 <html>
 <head>
     <title>Manage NFC Cards</title>
+    <link rel="icon" href="favicon.svg">
     <style>
         body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; }
         table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
