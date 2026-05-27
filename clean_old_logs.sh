@@ -5,7 +5,7 @@
 
 TIMES_FILE="/home/habiwan/nfc/times.csv"
 
-# 1. Get the date 6 months ago (for testing)
+# 1. Get the date 6 months ago
 LOG_CUTOFF=$(date -d "6 months ago" +%Y-%m-%d)
 
 # 2. Filter using universally compatible literal matching
