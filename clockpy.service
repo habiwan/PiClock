@@ -1,11 +1,11 @@
 [Unit]
-# Human readable name of the unit
-Description=Javier Clocking System replacement script
+Description=PiClock System raw data writing service
 After=multi-user.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/python /home/javier/nfc/clockin.py
+# Remember to adjust the paths!
+ExecStart=/usr/bin/python /home/habiwan/nfc/clockin.py
 Restart=always
 
 [Install]
