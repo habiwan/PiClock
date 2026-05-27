@@ -65,7 +65,7 @@ I also created some services on it:
 (Optional) I created a crontab that runs a trim of old data, keeps only last 6 months, can be adjusted...
 
 These Services keep the pi lean and the logic / webpage / Excel get their data from the NAS or from the PC. This way the pi only takes care of showing the time on the LCD,
-reading the cards with a confirmation beep, and copying the csv files somewhere else for processing (the NAS and webserver aka. a UbuntuVM with docker-compose-lamp "PC").
+reading the cards with a confirmation beep, and copying the csv files somewhere else for processing (the NAS and webserver aka. an UbuntuVM with docker-compose-lamp on a "PVE-PC" in my case).
 
 In my python script I added the sensor temp of the CPU for monitoring / troubeshooting reasons, but is not shown anywhere in my example. In my experience the pi with a heatsink never got too hot (under 60 celsius all the time, even on hot days).
 
