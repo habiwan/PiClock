@@ -3,8 +3,9 @@ This example shows connecting to the PN532 with I2C (requires clock
 stretching support), SPI, or UART. SPI is best, it uses the most pins but
 is the most reliable and universally supported.
 After initialization, try waving various 13.56MHz RFID cards over it!
-Modified and enhanced by Javier@Books etc. May/June 2025
-This example is production ready and has been working for a year now. We use an excel file that lists the date swiped and name of employee
+Modified and enhanced by F.Javier "habiwan" Puig Diaz in May/June 2025
+This example is production ready and has been working for a year now.
+It writes the raw times.csv file which is then used with names.csv later during processing.
 """
 
 import RPi.GPIO as GPIO # used for nfc and buzzer
