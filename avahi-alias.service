@@ -1,0 +1,14 @@
+[Unit]
+Description=Avahi mDNS Alias for piclock.local
+After=avahi-daemon.service
+Requires=avahi-daemon.service
+
+[Service]
+Type=simple
+# This service is te only service that if needed has to run on the UbuntuVM or PC that has the php code...
+# Adjust the IP !
+ExecStart=/usr/bin/avahi-publish -a -R piclock.local 192.168.X.X
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
