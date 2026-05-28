@@ -4,8 +4,12 @@ stretching support), SPI, or UART. SPI is best, it uses the most pins but
 is the most reliable and universally supported.
 After initialization, try waving various 13.56MHz RFID cards over it!
 Modified and enhanced by F.Javier "habiwan" Puig Diaz in May/June 2025
-Remember to adjust the paths on lines 18 and 51!
+Remember to adjust the paths!
 It writes the raw times.csv file which is then used with names.csv later during processing.
+This example is production ready and has been working since June 2025. 
+We were using an excel file that lists the date swiped and name of employee, 
+but now I developed a php webapp with the same functionality and nicer look.
+Copyleft by F.Javier Puig Diaz, May 2026
 """
 
 import RPi.GPIO as GPIO # used for nfc and buzzer
@@ -15,7 +19,7 @@ from time import sleep # added for buzzer
 from pathlib import Path # added to 'touch' the csv if it does not exist yet or gets deleted
 
 from pn532 import *
-Path('/home/habiwan/nfc/times.csv').touch()
+Path('/home/YOURPIUSER/nfc/times.csv').touch()
 
 if __name__ == '__main__':
     try:
@@ -48,7 +52,7 @@ if __name__ == '__main__':
                 continue
             temp = vcgencmd.measure_temp()
             s = ["UID: ", [hex(i) for i in uid], temp, str(datetime.now())]
-            with open("/home/habiwan/nfc/times.csv", "a") as f:
+            with open("/home/YOURPIUSER/nfc/times.csv", "a") as f:
                 f.writelines(str(s))
                 f.write("\n")
             print(s) # debug
