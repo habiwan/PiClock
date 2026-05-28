@@ -6,7 +6,7 @@ Requires=avahi-daemon.service
 [Service]
 Type=simple
 # This service is the only service that (if needed/wanted) has to run on the UbuntuVM or PC that has the php code...
-# Remember to adjust the IP !
+# Adjust the IP !
 ExecStart=/usr/bin/avahi-publish -a -R piclock.local 192.168.X.X
 Restart=always
 
