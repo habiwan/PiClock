@@ -4,11 +4,16 @@ stretching support), SPI, or UART. SPI is best, it uses the most pins but
 is the most reliable and universally supported.
 After initialization, try waving various 13.56MHz RFID cards over it!
 Modified and enhanced by F.Javier "habiwan" Puig Diaz in May/June 2025
-This example is to get an excel file file written with the codes and matching names so a number can be written on empty cards
+This optional set of script/service is to get an excel file file written with the codes of empty cards you swipe (whevever you get new cards) 
+For example you could get an excel file written with the codes and matching names so a number can be written on empty cards
 uses the production names.csv that I got from prescanning 100 cards and getting their unique ID on column 1 and _UNASSIGNEDXX on column 2
-GOAL is to see the results after swiping a card to write a little number in the corner with the unassigned card number for future employees / temps...
+so that matching names to their unique ID is simple. I suggest writing with a pen a number to a label on those new empty cards...
+This uses the same production names.csv file, new names like _UNASSIGNEDXX should be column 2 column 1 the unique ID stripped as shown in the get-table-data.php example:
+Look for /** 2. PARSE AND MAP TIMESTAMPS (times.csv) **/ and see what $combinedData = []; does...
+... or use an EXCEL with the formulae shown in the main README.md ....
+GOAL is to see the results after swiping a card and writing a little number in the corner with the unassigned card number for future employees / temps...
 This way the empty cards that all look the same will have the labelled number matched to their unique ID for later processing...
-Remember to adjust the paths on lines 21 and 54!
+Remember to adjust the paths!
 """
 
 import RPi.GPIO as GPIO # used for nfc and buzzer
@@ -18,7 +23,7 @@ from time import sleep # added for buzzer
 from pathlib import Path # added to 'touch' the csv if it does not exist yet or gets deleted
 
 from pn532 import *
-Path('/home/habiwan/nfc/emptycards.csv').touch()
+Path('/home/YOURPIUSER/nfc/emptycards.csv').touch()
 
 if __name__ == '__main__':
     try:
@@ -51,7 +56,7 @@ if __name__ == '__main__':
                 continue
             temp = vcgencmd.measure_temp()
             s = ["UID: ", [hex(i) for i in uid], temp, str(datetime.now())]
-            with open("/home/habiwan/nfc/emptycards.csv", "a") as f:
+            with open("/home/YOURPIUSER/nfc/emptycards.csv", "a") as f:
                 f.writelines(str(s))
                 f.write("\n")
             print(s) # debug
