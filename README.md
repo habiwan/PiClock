@@ -1,5 +1,5 @@
 # PiClock
-custom made Punchcard-System with NFC cards and a Raspberry Pi
+Custom made replacement of traditional Punchcard-Systems with NFC cards and a Raspberry Pi instead.
 
 ![alt text](image.png)
 
