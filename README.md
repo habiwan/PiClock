@@ -74,3 +74,5 @@ In my python script I added the sensor temp of the CPU for monitoring / troubesh
 The PC that hosts the webapp (a php page really running on mounted volume of a docker-compose-lamp installed on an UbuntuVM...) takes care of all the logic. The Excel only needs access to the NAS and also takes care of all the logic. As mentioned above, the pi uploads the names and times csv files to them when NFC cards are swiped...
 
 Prototyped, Proyected and Created by F.Javier "habiwan" Puig Diaz (https://github.com/habiwan).
+
+All software used is GPL licenced and hence there is no warranty for this modified free software either.
