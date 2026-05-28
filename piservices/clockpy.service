@@ -5,7 +5,7 @@ After=multi-user.target
 [Service]
 Type=simple
 # Remember to adjust the paths!
-ExecStart=/usr/bin/python /home/habiwan/nfc/clockin.py
+ExecStart=/usr/bin/python /home/YOURPIUSER/nfc/clockin.py
 Restart=always
 
 [Install]
