@@ -1,3 +1,87 @@
+<?php
+// Start a secure session
+session_start();
+
+// 1. CHOOSE YOUR MANAGEMENT PASSWORD HERE:
+define('STAFF_PASSWORD', 'simplepassword'); // find a better way if this bothers you. Hint: with a local file instead, this could be improved... BY YOU!
+define('TIMEOUT_SECONDS', 86400); // Inactivity threshold
+
+// Handle Explicit Logout
+if (isset($_GET['logout'])) {
+    unset($_SESSION['authenticated']);
+    unset($_SESSION['last_activity']);
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
+}
+
+// Handle Login Form Submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['x_secure_token'])) {
+    if ($_POST['x_secure_token'] === STAFF_PASSWORD) {
+        $_SESSION['authenticated'] = true;
+        $_SESSION['last_activity'] = time(); // Initialize activity timestamp
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit;
+    } else {
+        $login_error = "Incorrect password access denied.";
+    }
+}
+
+// Server-Side Inactivity Check (Fallback for security alignment)
+if (isset($_SESSION['authenticated']) && $_SESSION['authenticated'] === true) {
+    if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > TIMEOUT_SECONDS)) {
+        unset($_SESSION['authenticated']);
+        unset($_SESSION['last_activity']);
+        header("Location: " . $_SERVER['PHP_SELF'] . "?reason=timeout");
+        exit;
+    }
+    $_SESSION['last_activity'] = time(); // Refresh active timestamp on server interactions
+}
+
+// If a timeout redirect occurred, clear the access tokens immediately
+if (isset($_GET['reason']) && $_GET['reason'] === 'timeout') {
+    unset($_SESSION['authenticated']);
+    unset($_SESSION['last_activity']);
+}
+
+// If user is not authenticated, show the login gate
+if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
+    $display_msg = "Staff Access";
+    if (isset($_GET['reason']) && $_GET['reason'] === 'timeout') {
+        $login_error = "Logged out due to 24 hours of inactivity.";
+    }
+    ?>
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Staff Login</title>
+        <style>
+            body { font-family: Arial, sans-serif; background-color: #f4f6f9; padding-top: 100px; text-align: center; }
+            .login-box { max-width: 320px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+            h2 { margin-bottom: 20px; color: #333; }
+            input[type="password"] { width: 90%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; }
+            button { width: 97%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; }
+            button:hover { background-color: #0056b3; }
+            .error { color: #dc3545; font-weight: bold; margin-bottom: 15px; font-size: 14px; }
+        </style>
+    </head>
+    <body>
+        <div class="login-box">
+            <h2><?= htmlspecialchars($display_msg) ?></h2>
+            <?php if (isset($login_error)): ?>
+                <div class="error"><?= htmlspecialchars($login_error) ?></div>
+            <?php endif; ?>
+            <form method="POST" autocomplete="off">
+                <input type="password" name="x_secure_token" placeholder="Enter Password" autocomplete="new-password" required autofocus>
+                <button type="submit">Log In</button>
+            </form>
+        </div>
+    </body>
+    </html>
+    <?php
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -47,7 +131,7 @@
         .time-badge { background: #e3f2fd; color: #0d47a1; padding: 6px 14px; border-radius: 30px; font-size: 0.9rem; font-weight: 600; border: 1px solid #bbdefb; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
         
         .table-header { display: flex; justify-content: space-between; padding: 15px 25px; background: #0d47a1; color: white; font-weight: 500; border-radius: 12px; margin-bottom: 15px; position: relative; z-index: 2; }
-		.table-header a, .table-header a:link, .table-header a:visited { color: #ffffffff !important; text-decoration: none; cursor: default; }
+        .table-header a, .table-header a:link, .table-header a:visited { color: #ffffffff !important; text-decoration: none; cursor: default; }
         .footer { text-align: center; margin-top: 40px; color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; }
     </style>
 </head>
@@ -57,7 +141,7 @@
             <h1>'PiClock' NFC System</h1>
             <p>custom made Punchcard-System replacement</p>
         </header>
-               
+                
         <div class="controls">
             <div class="search-box">
                 <input type="text" id="searchInput" placeholder="Search employees or card IDs...">
@@ -83,7 +167,7 @@
             </div>
         
         <div class="footer">
-            'PiClock' NFC Timestamp Viewer &copy; 2025-<?php echo date('Y');?> <a href="mailto:habiwan@me.com" style="color: #fff;">F. Javier "habiwan" Puig Diaz</a>
+            'PiClock' NFC Timestamp Viewer <span style="display: inline-block; transform: rotateY(180deg);">&copy;</span>2025-<?php echo date('Y');?> made with &hearts; by F.Javier "<a href="mailto:habiwan@me.com" style="color: #fff;">habiwan</a>" Puig Diaz
         </div>
     </div>
 
@@ -148,7 +232,8 @@
         // Fetches the HTML from the backend and updates the container
         async function fetchTableData() {
             try {
-                const response = await fetch('get-table-data.php');
+                // FIXED: Appended a unique timestamp to smash browser caching
+                const response = await fetch('get-table-data.php?t=' + Date.now());
                 if (!response.ok) return;
                 const htmlRows = await response.text();
                 
@@ -166,8 +251,13 @@
         // Checks for file changes using your existing check_update script
         async function checkServerForUpdates() {
             try {
-                const response = await fetch('/check_update.php');
-                if (!response.ok) return;
+                // FIXED: Removed leading slash '/' for relative directory compatibility
+                // FIXED: Appended a unique timestamp to bypass browser caching completely
+                const response = await fetch('check_update.php?t=' + Date.now());
+                if (!response.ok) {
+                    console.warn('Update background check failed with status:', response.status);
+                    return;
+                }
                 
                 const latestVersion = await response.text();
 
@@ -182,8 +272,6 @@
                 if (latestVersion !== currentVersion) {
                     console.log('Change detected in background! Fetching new data...');
                     currentVersion = latestVersion;
-                    
-                    // Fetch new data instead of reloading the page
                     fetchTableData(); 
                 }
             } catch (error) {
@@ -192,7 +280,6 @@
         }
 
         // Check for updates every 3000 milliseconds (3 seconds)
-        // This will also trigger the initial data fetch on the first pass
         checkServerForUpdates(); 
         setInterval(checkServerForUpdates, 3000);
     </script>
