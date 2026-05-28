@@ -1,0 +1,3 @@
+Use this folder as an example of what services you should install in your pi
+in my example I run the services on this folder on the pi so they run in term the shell scripts
+as you can see from the nfc folder... subject to your own opinion / implementation...
