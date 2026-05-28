@@ -5,8 +5,8 @@ After=network.target
 [Service]
 Type=simple
 # Remember to adjust the path and user!
-User=habiwan
-ExecStart=/home/habiwan/nfc/sync_clocks.sh
+User=YOURPIUSER
+ExecStart=/home/YOURPIUSER/nfc/sync_clocks.sh
 Restart=on-failure
 RestartSec=5
 
