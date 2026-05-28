@@ -9,6 +9,7 @@ You could say that IF you want to implement your own version and want to do it m
 mount on the pi's /etc/fstab 2 targets:
  - //192.168.X.X/NASFOLDER /media/NAS cifs credentials=/root/.NASCREDS,uid=1000,gid=1000,noauto,x-systemd.automount,x-systemd.mount-timeout=30 0 0
  - //192.168.X.Y/WWWROOTFOLDER /media/uvm cifs credentials=/root/.UVMCREDS,uid=1000,gid=1000,noauto,x-systemd.automount,x-systemd.mount-timeout=30 0 0
+ - I later changed the wwwrootfolder setup for sshfs with pubkey auth for more security, see "sync_clocks.sh" for more info
 
 - make sure you have in the /root/folder the CREDS files with username and password for the "NAS" and "UVM"
 
