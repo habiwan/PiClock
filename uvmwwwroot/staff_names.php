@@ -86,7 +86,7 @@ $pi_ip = "192.168.X.X";
 $pi_user = "YOURPIUSER";
 $remote_file = "/home/YOURPIUSER/nfc/names.csv";
 $local_tmp = "/tmp/names.csv";
-$ssh_key = "/var/www/html/.ssh/id_ed25519"; // a better way of doing this is in planning using /var/www/secure_data with new docker compose mapping
+$ssh_key = "/var/www/html/.ssh/id_ed25519";
 
 $message = "";
 
@@ -198,13 +198,13 @@ if (($handle = fopen($local_tmp, "r")) !== FALSE) {
         <button type="submit">Save Changes</button>
     </form>
 
-    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <script src="JsBarcode.all.min.js"></script>
 
     <script>
         // 1. Initialize Barcodes
         document.querySelectorAll('.barcode').forEach(function(element) {
             const code = element.getAttribute('data-code');
-            JsBarcode(element, code, {
+            JsBarcode(element,"LOGIN|staff-" + code, {
                 format: "CODE128",
                 width: 1.5,
                 height: 35,

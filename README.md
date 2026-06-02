@@ -76,3 +76,5 @@ The PC that hosts the webapp (a php page really running on mounted volume of a d
 Prototyped, Proyected and Created by F.Javier "habiwan" Puig Diaz (https://github.com/habiwan).
 
 All software used is GPL licenced and hence there is no warranty for this modified free software either.
+
+Exception: /*! JsBarcode v3.11.5 | (c) Johan Lindell | MIT license */
