@@ -2,10 +2,9 @@ improved it yet a bit more with passwords for piclock and different password for
 
 Stretch Goals:
 
-1. Environment Variables in Docker-Compose
-2. Hardening with fail2ban (can be done in NPM plus)
+#1. Hardening with fail2ban (can be done in NPM plus)
 
-Environment variables are the gold standard for passing secrets into Docker containers because they keep passwords completely out of your source code.
+Environment variables are the gold standard for passing secrets into Docker containers because they keep passwords completely out of the source code.
 
 Here is how the conceptual flow works:
 
@@ -13,23 +12,34 @@ Step A: The docker-compose.yml file
 
 Inside my compose file, I define the variables under my web service. I can hardcode them there, or better yet, have Docker pull them from a hidden .env file on my host machine (ubuntuvm).
 
-YAML:
-
-version: '3.8'services:web:image: php:8.2-apacheports:- "80:80"volumes:- ./html:/var/www/htmlenvironment:- STAFF_PASSWORD=supersecurestaff123- MANAGEMENT_PASSWORD=bossmode456
+e.g.: update the YAML part of the lamp apache with something like:
+```
+  version: '3.8'
+   services:
+    web:
+     image: php:8.2-apache
+      ports:
+       - "80:80"
+      volumes:
+       - ./html:/var/www/html 
+   environment:
+    - STAFF_PASSWORD=weakpassword
+    - MANAGEMENT_PASSWORD=stongpassword
+```
+Still more room for improvement as I like to add a "secret folder" for the csv data and move the .ssh away from there as well that staff names mgt. page uses...
 
 Step B: How PHP reads it
 
 Inside my index.php or staff_names.php, I could completely remove the hardcoded password string and use PHP’s built-in getenv() function:
 
 PHP:
-
-// Old way: define('STAFF_PASSWORD', 'securepassword');// New way:
-
-define('STAFF_PASSWORD', getenv('STAFF_PASSWORD') ?: 'fallback_if_empty');
-
+```
+// Old way: define('STAFF_PASSWORD', 'securepassword');
+// New way: define('STAFF_PASSWORD', getenv('STAFF_PASSWORD') ?: 'fallback_if_empty');
+```
 Now, if someone grabs my PHP files, they only see getenv('STAFF_PASSWORD'). The actual passwords live strictly in the container's memory.
 
-2. The www-data User & The "Web Root" Myth
+#2. The www-data User & The "Web Root" Myth
 
 I was thinking that www-data can only access the html folder. This is a very common misconception!
 
@@ -43,7 +53,7 @@ Anything inside /var/www/html is publicly accessible via a web browser (e.g., ht
 
 Anything outside of it (like /var/www/secrets/) is completely invisible to the internet, but PHP can still read and write to it perfectly.
 
-4. Thoughts on CSV Security & Docker Volumes
+#3. Thoughts on CSV Security & Docker Volumes
 
 If names.csv and times.csv are sitting in the local public web root, my login gates are essentially useless because anyone who guesses the URL can just download the files directly.... (no biggie as they are constantly overwritten)....
 
@@ -56,8 +66,11 @@ Inside my Docker container inside my UbuntuVM inside my Proxmox PC, instead of k
 In my Docker Compose: I map a folder from the Raspberry Pi to a private folder inside the container:
 
 YAML:
-
-volumes:- ./html:/var/www/html            # Public web files- ./nfc_data:/var/www/secure_data # Private CSV files
+```
+volumes:
+ - ./html:/var/www/html # Public web files
+ - ./nfc_data:/var/www/secure_data # Private CSV files
+```
 
 In my PHP Code: I could change my file path to point outside the web root:
 
