@@ -3,6 +3,7 @@ improved it yet a bit more with passwords for piclock and different password for
 Stretch Goals:
 
 1. Environment Variables in Docker-Compose
+2. Hardening with fail2ban (can be done in NPM plus)
 
 Environment variables are the gold standard for passing secrets into Docker containers because they keep passwords completely out of your source code.
 
