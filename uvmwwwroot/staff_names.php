@@ -3,7 +3,7 @@
 session_start();
 
 // 1. CHOOSE YOUR MANAGEMENT PASSWORD HERE:
-define('MANAGEMENT_PASSWORD', 'BOOKSetc.8732!'); // find a better way if this bothers you. Hint: with a local file or sys variable instead, this could be improved... BY YOU!
+define('MANAGEMENT_PASSWORD', 'SuperSecurePassword'); // a better way with a local sys variable in the docker compose yaml is in planning
 define('MANAGEMENT_TIMEOUT_SECONDS', 120); // Inactivity threshold
 
 // Handle Explicit Logout
@@ -81,12 +81,12 @@ if (!isset($_SESSION['MANAGEMENT_PASSWORD_authenticated']) || $_SESSION['MANAGEM
     exit;
 }
 
-// Configuration: THIS NEEDS TO BE CHANGED!
+// Configuration
 $pi_ip = "192.168.X.X"; 
 $pi_user = "YOURPIUSER";
 $remote_file = "/home/YOURPIUSER/nfc/names.csv";
 $local_tmp = "/tmp/names.csv";
-$ssh_key = "/var/www/html/.ssh/id_ed25519";
+$ssh_key = "/var/www/html/.ssh/id_ed25519"; // a better way of doing this is in planning using /var/www/secure_data with new docker compose mapping
 
 $message = "";
 
@@ -94,7 +94,7 @@ $message = "";
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cards'])) {
     $fp = fopen($local_tmp, 'w');
     
-    // FIX 1: ALWAYS write a proper header row at the top of the file first!
+    // ALWAYS write a proper header row at the top of the file first!
     fputcsv($fp, ['CardID', 'EmployeeName'], ",", "\"", "\\"); 
     
     foreach ($_POST['cards'] as $card_id => $name) {
@@ -122,7 +122,7 @@ if ($output) {
 $csv_data = [];
 if (($handle = fopen($local_tmp, "r")) !== FALSE) {
     
-    // FIX 2: Safely check the first line. If it's a real card, DON'T skip it!
+    // Safely check the first line. If it's a real card, DON'T skip it!
     $first_row = fgetcsv($handle, 1000, ",", "\"", "\\");
     if ($first_row !== FALSE) {
         // If the first row is NOT our defined header, it's a real card from your old file! Save it.
@@ -147,16 +147,17 @@ if (($handle = fopen($local_tmp, "r")) !== FALSE) {
     <title>Manage NFC Cards</title>
     <link rel="icon" href="favicon.svg">
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; }
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: auto; } /* Increased max-width to fit barcode */
         .header-container { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 20px; }
         .logout-btn { padding: 8px 12px; background-color: #dc3545; color: white; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 14px; }
         .logout-btn:hover { background-color: #bd2130; }
         table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; vertical-align: middle; }
         th { background-color: #f2f2f2; }
         input[type="text"] { width: 90%; padding: 5px; }
         button { padding: 10px 15px; background-color: #007bff; color: white; border: none; cursor: pointer; }
         button:hover { background-color: #0056b3; }
+        .barcode { display: block; margin: auto; }
     </style>
 </head>
 <body>
@@ -167,9 +168,9 @@ if (($handle = fopen($local_tmp, "r")) !== FALSE) {
     </div>
 
     <p>Update the names below to replace the _UNASSIGNED values</p>
-    <p>When done, scroll to the bottom and click on "Save Changes"</p></p>
+    <p>When done, scroll to the bottom and click on "Save Changes"</p>
     <p>WARNING! HANDLE WITH CARE! CHECK TWICE BEFORE SAVING!</p>
-    <p>when clicking on "Save Changes" at the bottom ALL VALUES will be updated!</p></p>
+    <p>When clicking on "Save Changes" at the bottom ALL VALUES will be updated!</p>
     <p>This page will timeout in 2 minutes</p>
 
     <?= $message ?>
@@ -179,7 +180,7 @@ if (($handle = fopen($local_tmp, "r")) !== FALSE) {
             <tr>
                 <th>Card ID</th>
                 <th>Employee</th>
-            </tr>
+                <th style="text-align: center;">Barcode</th> </tr>
             <?php foreach ($csv_data as $card_id => $name): ?>
             <tr>
                 <td><?= htmlspecialchars($card_id) ?></td>
@@ -188,15 +189,33 @@ if (($handle = fopen($local_tmp, "r")) !== FALSE) {
                            name="cards[<?= htmlspecialchars($card_id) ?>]" 
                            value="<?= htmlspecialchars($name) ?>">
                 </td>
+                <td style="text-align: center;">
+                    <svg class="barcode" data-code="<?= htmlspecialchars($card_id) ?>"></svg>
+                </td>
             </tr>
             <?php endforeach; ?>
         </table>
         <button type="submit">Save Changes</button>
     </form>
 
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+
     <script>
+        // 1. Initialize Barcodes
+        document.querySelectorAll('.barcode').forEach(function(element) {
+            const code = element.getAttribute('data-code');
+            JsBarcode(element, code, {
+                format: "CODE128",
+                width: 1.5,
+                height: 35,
+                displayValue: false, // Prevents printing the text below the barcode
+                margin: 5
+            });
+        });
+
+        // 2. Idle Timeout Script
         (function() {
-            const timeoutDuration = 20000; // 20 seconds in milliseconds
+            const timeoutDuration = 120000; // 120 seconds in milliseconds (fixed from 20 seconds)
             let idleTimer;
 
             function resetTimer() {
