@@ -17,18 +17,18 @@ For the SSHFS UVM www folder mount on the pi, first apt install sshfs then you g
 
 I also wanted to keep my samba mount for local dev on the php code an the UMV machine but not as guest so I had to run smbpasswd command on the UVM (UbuntuVM).
 
-# If you also want to keep the /etc/samba/smb.conf on the UVM you still want to keep samba with password secured:
-# [www]
-#    path = /home/YOURUVMUSER/docker/docker-compose-lamp/www
-#    browseable = yes
-#    writable = yes
-#    read only = no
-#    public = no
-#    guest ok = no
-#    valid users = YOURUVMUSER
-#    force user = YOURUVMUSER
-#    create mask = 0664
-#    directory mask = 0775
+If you also want to keep the /etc/samba/smb.conf on the UVM you still want to keep samba with password secured:
+ [www]
+    path = /home/YOURUVMUSER/docker/docker-compose-lamp/www
+    browseable = yes
+    writable = yes
+    read only = no
+    public = no
+    guest ok = no
+    valid users = YOURUVMUSER
+    force user = YOURUVMUSER
+    create mask = 0664
+    directory mask = 0775
 
 - mount it manually once on the pi, it will ask for password then it should be using the ssh keys... this should definitely be improved for production.
 
