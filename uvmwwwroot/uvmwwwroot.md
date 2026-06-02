@@ -9,3 +9,5 @@ in my example I mount this folder on the pi's /etc/fstab so the scripts therein 
 names.csv and times.csv here 
 
 (I also pi-mounted a "NAS" wannabe... horrible consumer grade WD MyCloud for backups)
+
+EDIT: Added barcode for the staff names managment table in case unique barcodes wanted to be scanned
