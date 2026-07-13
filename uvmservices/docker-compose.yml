@@ -1,4 +1,53 @@
-version: "3"
+services:
+  web:
+    image: custom-lamp-php
+    container_name: lamp-web
+    restart: unless-stopped
+    ports:
+      - 8080:80
+    volumes:
+      - /home/habiwan/Code/lamp/www:/var/www/html
+      - /home/habiwan/Code/lamp/apache/000-default.conf:/etc/apache2/sites-available/000-default.conf
+    environment:
+      MYSQL_HOST: db
+      MYSQL_DATABASE: ${LAMPAPP}
+      MYSQL_USER: ${LAMPUSER}
+      MYSQL_PASSWORD: ${LAMPPASSWORD}
+    depends_on:
+      - db
+    networks:
+      - lamp-net
+  db:
+    image: mysql:8.0
+    container_name: lamp-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_ROOT_HOST: ${MYSQL_ROOT_HOST}
+      MYSQL_DATABASE: ${LAMPAPP}
+      MYSQL_USER: ${LAMPUSER}
+      MYSQL_PASSWORD: ${LAMPPASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+      - mysql_init:/docker-entrypoint-initdb.d
+    networks:
+      - lamp-net
+  adminer:
+    image: adminer:latest
+    container_name: lamp-adminer
+    restart: unless-stopped
+    ports:
+      - 8081:8080
+    environment:
+      ADMINER_DEFAULT_SERVER: db
+    networks:
+      - lamp-net
+volumes:
+  db_data:
+  mysql_init:
+networks:
+  lamp-net:
+    driver: bridgeversion: "3"
 
 services:
   webserver:
