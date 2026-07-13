@@ -85,3 +85,5 @@ $remote_file = "/var/www/secure_data/names.csv"; // Immune to web browsers!
 By doing this, even if a user bypasses my login screens, Apache will throw a 404 Error if they try to type example.com/secure_data/names.csv because Apache doesn't even know that folder exists. But my PHP code can access it all day long!
 
 If I got enough time, I shall improve it... I have to remember to adjust the volume mounts, shell scripts that run as services as well as the php code!
+
+UPDATE: I have modified the python that reads the card data and the php to use mysql database now, so some of the caveats above are no more like cross-copying files etc...
