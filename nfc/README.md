@@ -40,3 +40,6 @@ and "UVM" which was a decomissioned now "upclycled" consumer-grade PC that I ins
 
 If you want to use this like me, the rationale was to have the pi as lean as possible only processing the nfc card "scans" and copying the data over to
 the "webapp - UbuntuVM - PVE machine" and to the "NAS" for backups / disaster recovery... The processing goes to Excel clients or php / LAMP on the "PC"... 
+
+UPDADTE:
+I modified the main python so that it uses mysql so most of the above is not needed anymore byt feel free to keep the csvs as raw hardcopies... I modified the php pages to use mysql too and the Docker compose to a Portainer stack that could be used on a Pi too...
