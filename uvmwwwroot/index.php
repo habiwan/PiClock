@@ -3,7 +3,7 @@
 session_start();
 
 // 1. CHOOSE YOUR MANAGEMENT PASSWORD HERE:
-define('STAFF_PASSWORD', 'simplepassword'); // find a better way if this bothers you. Hint: with a local file instead, this could be improved... BY YOU!
+define('STAFF_PASSWORD', 'simplepassword'); 
 define('TIMEOUT_SECONDS', 86400); // Inactivity threshold
 
 // Handle Explicit Logout
@@ -18,7 +18,7 @@ if (isset($_GET['logout'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['x_secure_token'])) {
     if ($_POST['x_secure_token'] === STAFF_PASSWORD) {
         $_SESSION['authenticated'] = true;
-        $_SESSION['last_activity'] = time(); // Initialize activity timestamp
+        $_SESSION['last_activity'] = time(); 
         header("Location: " . $_SERVER['PHP_SELF']);
         exit;
     } else {
@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['x_secure_token'])) {
     }
 }
 
-// Server-Side Inactivity Check (Fallback for security alignment)
+// Server-Side Inactivity Check
 if (isset($_SESSION['authenticated']) && $_SESSION['authenticated'] === true) {
     if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > TIMEOUT_SECONDS)) {
         unset($_SESSION['authenticated']);
@@ -34,10 +34,9 @@ if (isset($_SESSION['authenticated']) && $_SESSION['authenticated'] === true) {
         header("Location: " . $_SERVER['PHP_SELF'] . "?reason=timeout");
         exit;
     }
-    $_SESSION['last_activity'] = time(); // Refresh active timestamp on server interactions
+    $_SESSION['last_activity'] = time();
 }
 
-// If a timeout redirect occurred, clear the access tokens immediately
 if (isset($_GET['reason']) && $_GET['reason'] === 'timeout') {
     unset($_SESSION['authenticated']);
     unset($_SESSION['last_activity']);
@@ -50,33 +49,62 @@ if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
         $login_error = "Logged out due to 24 hours of inactivity.";
     }
     ?>
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Staff Login</title>
-        <style>
-            body { font-family: Arial, sans-serif; background-color: #f4f6f9; padding-top: 100px; text-align: center; }
-            .login-box { max-width: 320px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-            h2 { margin-bottom: 20px; color: #333; }
-            input[type="password"] { width: 90%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; }
-            button { width: 97%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; }
-            button:hover { background-color: #0056b3; }
-            .error { color: #dc3545; font-weight: bold; margin-bottom: 15px; font-size: 14px; }
-        </style>
-    </head>
-    <body>
-        <div class="login-box">
-            <h2><?= htmlspecialchars($display_msg) ?></h2>
-            <?php if (isset($login_error)): ?>
-                <div class="error"><?= htmlspecialchars($login_error) ?></div>
-            <?php endif; ?>
-            <form method="POST" autocomplete="off">
-                <input type="password" name="x_secure_token" placeholder="Enter Password" autocomplete="new-password" required autofocus>
-                <button type="submit">Log In</button>
-            </form>
-        </div>
-    </body>
-    </html>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Staff Login</title>
+    <link rel="icon" href="favicon.png" type="image/png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        
+        /* 1. Change body to flex-column */
+        body { 
+            background: linear-gradient(180deg, #1c3344, #102a33, #000000); 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; /* Keeps it centered horizontally */
+        }
+
+        /* 2. Push login box to the center of available space */
+        .login-box { 
+            margin: auto; 
+            background: rgba(255, 255, 255, 0.95); 
+            padding: 40px 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); 
+            width: 100%; 
+            max-width: 380px; 
+            text-align: center; 
+        }
+
+        h2 { margin-bottom: 25px; color: #0d47a1; font-size: 1.8rem; font-weight: 600; }
+        input[type="password"] { width: 100%; padding: 15px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; transition: all 0.3s; }
+        input[type="password"]:focus { outline: none; border-color: #1976d2; box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.15); }
+        button { width: 100%; padding: 15px; background-color: #1976d2; color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        button:hover { background-color: #1565c0; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(25, 118, 210, 0.3); }
+        .error { background: #ffebee; color: #c62828; padding: 12px; border-radius: 8px; font-weight: bold; margin-bottom: 20px; font-size: 0.9rem; border: 1px solid #ffcdd2; }
+        
+        /* 3. Footer stays at the bottom */
+        .footer { text-align: center; padding-bottom: 20px; color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h2><?= htmlspecialchars($display_msg) ?></h2>
+        <?php if (isset($login_error)): ?>
+            <div class="error"><?= htmlspecialchars($login_error) ?></div>
+        <?php endif; ?>
+        <form method="POST" autocomplete="off">
+            <input type="password" name="x_secure_token" placeholder="Enter Password" autocomplete="new-password" required autofocus>
+            <button type="submit">Log In</button>
+        </form>
+    </div>
+    <div class="footer">
+        'PiClock' NFC Timestamp Viewer <span style="display: inline-block; transform: rotateY(180deg);">&copy;</span>2025-<?php echo date('Y');?> made with &hearts; by F.Javier "<a href="mailto:habiwan@me.com" style="color: #fff;">habiwan</a>" Puig Diaz
+    </div>
+</body>
+</html>
     <?php
     exit;
 }
@@ -88,7 +116,7 @@ if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PiClock Dashboard</title>
-    <link rel="icon" href="favicon.svg">
+    <link rel="icon" href="favicon.png" type="image/png">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background: linear-gradient(180deg, #1c3344, #102a33, #000000); min-height: 100vh; padding: 30px 20px; color: #fff; }
@@ -139,7 +167,7 @@ if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
     <div class="container">
         <header>
             <h1>'PiClock' NFC System</h1>
-            <p>custom made Punchcard-System replacement</p>
+            <p>Punchcard-System replacement</p>
         </header>
                 
         <div class="controls">
@@ -232,7 +260,7 @@ if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
         // Fetches the HTML from the backend and updates the container
         async function fetchTableData() {
             try {
-                // FIXED: Appended a unique timestamp to smash browser caching
+                // Ensure this points to the new PHP script you created in the first step
                 const response = await fetch('get-table-data.php?t=' + Date.now());
                 if (!response.ok) return;
                 const htmlRows = await response.text();
@@ -248,11 +276,9 @@ if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
             }
         }
 
-        // Checks for file changes using your existing check_update script
+        // Checks the database for new row counts
         async function checkServerForUpdates() {
             try {
-                // FIXED: Removed leading slash '/' for relative directory compatibility
-                // FIXED: Appended a unique timestamp to bypass browser caching completely
                 const response = await fetch('check_update.php?t=' + Date.now());
                 if (!response.ok) {
                     console.warn('Update background check failed with status:', response.status);
@@ -268,9 +294,9 @@ if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
                     return;
                 }
 
-                // If a change happened in the CSVs
+                // If a change happened in the MySQL Database
                 if (latestVersion !== currentVersion) {
-                    console.log('Change detected in background! Fetching new data...');
+                    console.log('Database change detected! Fetching new data...');
                     currentVersion = latestVersion;
                     fetchTableData(); 
                 }
