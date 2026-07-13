@@ -11,3 +11,16 @@ names.csv and times.csv here
 (I also pi-mounted a "NAS" wannabe... horrible consumer grade WD MyCloud for backups)
 
 EDIT: Added barcode for the staff names managment table in case unique barcodes wanted to be scanned
+
+UPDATE: modified so no more dirty raw csvs are used, but pure mysql from an updaated lamp that can run on pies. table structure has to be:
+CREATE TABLE IF NOT EXISTS times (
+        UID VARCHAR(12),
+        temp FLOAT,
+        timestamp DATETIME
+
+and 
+
+CREATE TABLE names (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        CardID VARCHAR(50),
+        Name VARCHAR(100)
