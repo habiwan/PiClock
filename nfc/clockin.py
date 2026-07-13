@@ -9,60 +9,81 @@ It writes the raw times.csv file which is then used with names.csv later during 
 This example is production ready and has been working since June 2025. 
 We were using an excel file that lists the date swiped and name of employee, 
 but now I developed a php webapp with the same functionality and nicer look.
-Copyleft by F.Javier Puig Diaz, May 2026
+Copyleft by F.Javier Puig Diaz, July 2026
+UPDATE: mysql for lamp usage (pip3 install mysql-connector-python first of course...)
 """
 
-import RPi.GPIO as GPIO # used for nfc and buzzer
-import vcgencmd # added for CPU temperature readings
-from datetime import datetime # added for timestamps
-from time import sleep # added for buzzer
-from pathlib import Path # added to 'touch' the csv if it does not exist yet or gets deleted
-
+importimport RPi.GPIO as GPIO
+import vcgencmd
+import mysql.connector
+from datetime import datetime
+from time import sleep
 from pn532 import *
-Path('/home/YOURPIUSER/nfc/times.csv').touch()
+
+# --- DATABASE CONFIGURATION ---
+db_config = {
+    'host': 'db',          # Or your Pi's IP/localhost
+    'user': 'root',
+    'password': 'rootpassword',
+    'database': 'lampapp'
+}
+
+def log_to_db(uid_hex, timestamp):
+    """Inserts the swipe event directly into MySQL."""
+    try:
+        # Convert list of hex to a clean string, e.g., "0xAA 0xBB 0xCC"
+        uid_str = " ".join([hex(i) for i in uid_hex])
+        
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor()
+        
+        sql = "INSERT INTO times (UID, timestamp) VALUES (%s, %s)"
+        cursor.execute(sql, (uid_str, timestamp))
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        print(f"Successfully logged {uid_str} to database.")
+    except mysql.connector.Error as err:
+        print(f"Database error: {err}")
 
 if __name__ == '__main__':
     try:
         pn532 = PN532_I2C(debug=False, reset=20, req=16)
-
         ic, ver, rev, support = pn532.get_firmware_version()
         print('Found PN532 with firmware version: {0}.{1}'.format(ver, rev))
-
-        # Configure PN532 to communicate with MiFare cards
         pn532.SAM_configuration()
 
-        #Disable warnings (optional)
         GPIO.setwarnings(False)
-        #Select GPIO mode
         GPIO.setmode(GPIO.BCM)
-        #Set buzzer - pin 23 as output
-        buzzer=23
-        GPIO.setup(buzzer,GPIO.OUT)
-        # debug Beep on boot
-        GPIO.output(buzzer,GPIO.HIGH)
-        sleep(0.01)
-        GPIO.output(buzzer,GPIO.LOW)
+        buzzer = 23
+        GPIO.setup(buzzer, GPIO.OUT)
+
+        # Boot beep
+        GPIO.output(buzzer, GPIO.HIGH)
+        sleep(0.1)
+        GPIO.output(buzzer, GPIO.LOW)
+        
         print('Waiting for RFID/NFC card...')
+        
         while True:
-            # Check if a card is available to read
             uid = pn532.read_passive_target(timeout=0.5)
-            print('', end="")
-            # Try again if no card is available.
             if uid is None:
                 continue
-            temp = vcgencmd.measure_temp()
-            s = ["UID: ", [hex(i) for i in uid], temp, str(datetime.now())]
-            with open("/home/YOURPIUSER/nfc/times.csv", "a") as f:
-                f.writelines(str(s))
-                f.write("\n")
-            print(s) # debug
-            GPIO.output(buzzer,GPIO.HIGH)
-            #print("Beep") # debug
-            sleep(0.1) # Beep delay in seconds
-            GPIO.output(buzzer,GPIO.LOW)
-            sleep(1.7) # debounce
-            f.close()
+
+            # Log to DB
+            current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            log_to_db(uid, current_time)
+
+            # Buzzer feedback
+            GPIO.output(buzzer, GPIO.HIGH)
+            sleep(0.1)
+            GPIO.output(buzzer, GPIO.LOW)
+            
+            # Debounce
+            sleep(1.7)
+
     except Exception as e:
-        print(e)
+        print(f"System error: {e}")
     finally:
         GPIO.cleanup()
