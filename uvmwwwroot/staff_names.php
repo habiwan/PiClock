@@ -3,7 +3,7 @@
 session_start();
 
 // 1. CHOOSE YOUR MANAGEMENT PASSWORD HERE:
-define('MANAGEMENT_PASSWORD', 'SuperSecurePassword'); // a better way with a local sys variable in the docker compose yaml is in planning
+define('MANAGEMENT_PASSWORD', 'SuperSecurePassword'); 
 define('MANAGEMENT_TIMEOUT_SECONDS', 120); // Inactivity threshold
 
 // Handle Explicit Logout
@@ -18,7 +18,7 @@ if (isset($_GET['logout'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['x_secure_token'])) {
     if ($_POST['x_secure_token'] === MANAGEMENT_PASSWORD) {
         $_SESSION['MANAGEMENT_PASSWORD_authenticated'] = true;
-        $_SESSION['MANAGEMENT_last_activity'] = time(); // Initialize activity timestamp
+        $_SESSION['MANAGEMENT_last_activity'] = time();
         header("Location: " . $_SERVER['PHP_SELF']);
         exit;
     } else {
@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['x_secure_token'])) {
     }
 }
 
-// Server-Side Inactivity Check (Fallback for security alignment)
+// Server-Side Inactivity Check
 if (isset($_SESSION['MANAGEMENT_PASSWORD_authenticated']) && $_SESSION['MANAGEMENT_PASSWORD_authenticated'] === true) {
     if (isset($_SESSION['MANAGEMENT_last_activity']) && (time() - $_SESSION['MANAGEMENT_last_activity'] > MANAGEMENT_TIMEOUT_SECONDS)) {
         unset($_SESSION['MANAGEMENT_PASSWORD_authenticated']);
@@ -34,16 +34,14 @@ if (isset($_SESSION['MANAGEMENT_PASSWORD_authenticated']) && $_SESSION['MANAGEME
         header("Location: " . $_SERVER['PHP_SELF'] . "?reason=timeout");
         exit;
     }
-    $_SESSION['MANAGEMENT_last_activity'] = time(); // Refresh active timestamp on server interactions
+    $_SESSION['MANAGEMENT_last_activity'] = time();
 }
 
-// If the JavaScript idle timer triggered a timeout redirect, clear the access tokens immediately
 if (isset($_GET['reason']) && $_GET['reason'] === 'timeout') {
     unset($_SESSION['MANAGEMENT_PASSWORD_authenticated']);
     unset($_SESSION['MANAGEMENT_last_activity']);
 }
 
-// If user is not authenticated, show the login gate
 if (!isset($_SESSION['MANAGEMENT_PASSWORD_authenticated']) || $_SESSION['MANAGEMENT_PASSWORD_authenticated'] !== true) {
     $display_msg = "Management Access";
     if (isset($_GET['reason']) && $_GET['reason'] === 'timeout') {
@@ -51,193 +49,194 @@ if (!isset($_SESSION['MANAGEMENT_PASSWORD_authenticated']) || $_SESSION['MANAGEM
     }
     ?>
     <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Management Login</title>
-        <style>
-            body { font-family: Arial, sans-serif; background-color: #f4f6f9; padding-top: 100px; text-align: center; }
-            .login-box { max-width: 320px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-            h2 { margin-bottom: 20px; color: #333; }
-            input[type="password"] { width: 90%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; }
-            button { width: 97%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; }
-            button:hover { background-color: #0056b3; }
-            .error { color: #dc3545; font-weight: bold; margin-bottom: 15px; font-size: 14px; }
-        </style>
-    </head>
-    <body>
-        <div class="login-box">
-            <h2><?= htmlspecialchars($display_msg) ?></h2>
-            <?php if (isset($login_error)): ?>
-                <div class="error"><?= htmlspecialchars($login_error) ?></div>
-            <?php endif; ?>
-            <form method="POST" autocomplete="off">
-                <input type="password" name="x_secure_token" placeholder="Enter Password" autocomplete="new-password" required autofocus>
-                <button type="submit">Log In</button>
-            </form>
-        </div>
-    </body>
-    </html>
-    <?php
-    exit;
+<html>
+<head>
+    <title>Management Login</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        
+        /* 1. Updated body to vertical flex column */
+        body { 
+            background: linear-gradient(180deg, #1c3344, #102a33, #000000); 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
+        
+        /* 2. Margin: auto pushes the box to the center of remaining space */
+        .login-box { 
+            margin: auto; 
+            background: rgba(255, 255, 255, 0.95); 
+            padding: 40px 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); 
+            width: 100%; 
+            max-width: 380px; 
+            text-align: center; 
+        }
+        
+        h2 { margin-bottom: 25px; color: #0d47a1; font-size: 1.8rem; font-weight: 600; }
+        input[type="password"] { width: 100%; padding: 15px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; }
+        button { width: 100%; padding: 15px; background-color: #1976d2; color: white; border: none; border-radius: 8px; font-size: 1.1rem; cursor: pointer; }
+        .error { background: #ffebee; color: #c62828; padding: 12px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ffcdd2; }
+        
+        /* 3. Footer fixed at bottom */
+        .footer { 
+            text-align: center; 
+            padding-bottom: 20px; 
+            color: rgba(255, 255, 255, 0.7); 
+            font-size: 0.9rem; 
+        }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h2><?= htmlspecialchars($display_msg) ?></h2>
+        <?php if (isset($login_error)): ?>
+            <div class="error"><?= htmlspecialchars($login_error) ?></div>
+        <?php endif; ?>
+        <form method="POST" autocomplete="off">
+            <input type="password" name="x_secure_token" placeholder="Enter Password" required autofocus>
+            <button type="submit">Secure Log In</button>
+        </form>
+    </div>
+    <div class="footer">
+        'PiClock' NFC Timestamp Viewer <span style="display: inline-block; transform: rotateY(180deg);">&copy;</span>2025-<?php echo date('Y');?> made with &hearts; by F.Javier "<a href="mailto:habiwan@me.com" style="color: #fff;">habiwan</a>" Puig Diaz
+    </div>
+</body>
+</html>
+    <?php exit;
 }
 
-// Configuration
-$pi_ip = "192.168.X.X"; 
-$pi_user = "YOURPIUSER";
-$remote_file = "/home/YOURPIUSER/nfc/names.csv";
-$local_tmp = "/tmp/names.csv";
-$ssh_key = "/var/www/html/.ssh/id_ed25519";
+/** Database Connection **/
+$dbHost = 'db'; $dbName = 'lampapp'; $dbUser = 'root'; $dbPass = 'rootpassword';
+
+try {
+    $pdo = new PDO("mysql:host=$dbHost;dbname=$dbName;charset=utf8mb4", $dbUser, $dbPass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+} catch (PDOException $e) { die("Database connection failed: " . $e->getMessage()); }
 
 $message = "";
 
-// 1. Handle Form Submission (Save Data)
+// 1. Handle Form Submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cards'])) {
-    $fp = fopen($local_tmp, 'w');
-    
-    // ALWAYS write a proper header row at the top of the file first!
-    fputcsv($fp, ['CardID', 'EmployeeName'], ",", "\"", "\\"); 
-    
-    foreach ($_POST['cards'] as $card_id => $name) {
-        // Sanitize inputs
-        $clean_id = trim(strip_tags($card_id));
-        $clean_name = trim(strip_tags($name));
-        fputcsv($fp, [$clean_id, $clean_name], ",", "\"", "\\");
-    }
-    fclose($fp);
-    
-    // SCP the updated file back to the Pi
-    $scp_cmd = "scp -i $ssh_key $local_tmp $pi_user@$pi_ip:$remote_file 2>&1";
-    shell_exec($scp_cmd);
-    $message = "<div style='color: green; font-weight: bold; margin-bottom: 15px;'>File updated successfully!</div>";
+    try {
+        $pdo->beginTransaction();
+        $stmt = $pdo->prepare("UPDATE names SET CardID = ?, Name = ? WHERE id = ?");
+        
+        foreach ($_POST['cards'] as $id => $data) {
+            $stmt->execute([trim($data['CardID']), trim($data['Name']), $id]);
+        }
+        $pdo->commit();
+        $message = "<div style='color: #81c784; background: rgba(129, 199, 132, 0.1); border: 1px solid #81c784; padding: 15px; border-radius: 8px; font-weight: bold; margin-bottom: 20px;'>Database updated successfully!</div>";
+    } catch (Exception $e) { $pdo->rollBack(); $message = "<div style='color: #e57373; border: 1px solid #e57373; padding: 15px; border-radius: 8px; margin-bottom: 20px;'>Error: " . $e->getMessage() . "</div>"; }
 }
 
-// 2. Fetch the latest file from the Pi to display
-$fetch_cmd = "scp -o StrictHostKeyChecking=no -i $ssh_key $pi_user@$pi_ip:$remote_file $local_tmp 2>&1";
-$output = shell_exec($fetch_cmd);
-if ($output) {
-    echo "<pre style='background: #fee; padding: 10px; border: 1px solid #fcc;'>SCP Debug Output:\n" . htmlspecialchars($output) . "</pre>";
-}
-
-// 3. Parse the CSV
-$csv_data = [];
-if (($handle = fopen($local_tmp, "r")) !== FALSE) {
-    
-    // Safely check the first line. If it's a real card, DON'T skip it!
-    $first_row = fgetcsv($handle, 1000, ",", "\"", "\\");
-    if ($first_row !== FALSE) {
-        // If the first row is NOT our defined header, it's a real card from your old file! Save it.
-        if ($first_row[0] !== 'CardID') {
-            $csv_data[$first_row[0]] = $first_row[1];
-        }
-    }
-    
-    // Loop through the remaining rows as normal
-    while (($data = fgetcsv($handle, 1000, ",", "\"", "\\")) !== FALSE) {
-        if (count($data) >= 2) {
-            $csv_data[$data[0]] = $data[1];
-        }
-    }
-    fclose($handle);
-}
+// 2. Fetch data with Sorting Logic
+$sort = (isset($_GET['sort']) && $_GET['sort'] === 'name') ? 'Name ASC' : 'id ASC';
+$stmt = $pdo->query("SELECT id, CardID, Name FROM names ORDER BY $sort");
+$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
-
 <!DOCTYPE html>
 <html>
 <head>
     <title>Manage NFC Cards</title>
-    <link rel="icon" href="favicon.svg">
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: auto; } /* Increased max-width to fit barcode */
-        .header-container { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 20px; }
-        .logout-btn { padding: 8px 12px; background-color: #dc3545; color: white; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 14px; }
-        .logout-btn:hover { background-color: #bd2130; }
-        table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; vertical-align: middle; }
-        th { background-color: #f2f2f2; }
-        input[type="text"] { width: 90%; padding: 5px; }
-        button { padding: 10px 15px; background-color: #007bff; color: white; border: none; cursor: pointer; }
-        button:hover { background-color: #0056b3; }
-        .barcode { display: block; margin: auto; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: linear-gradient(180deg, #1c3344, #102a33, #000000); min-height: 100vh; padding: 40px 20px; color: #fff; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .header-container { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.2); margin-bottom: 20px; }
+        .sort-nav { margin-bottom: 20px; }
+        .sort-nav a { color: #fff; text-decoration: none; padding: 8px 15px; background: rgba(255,255,255,0.1); border-radius: 6px; margin-right: 10px; font-size: 0.9rem; }
+        .sort-nav a.active { background: #1976d2; }
+        .btn { padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 1rem; border: none; cursor: pointer; text-decoration: none; display: inline-block; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .btn-logout { background-color: #e53935; color: white; }
+        .btn-logout:hover { background-color: #c62828; transform: translateY(-2px); }
+        .btn-save { background-color: #1976d2; color: white; width: 100%; padding: 16px; font-size: 1.2rem; margin-top: 10px; }
+        .btn-save:hover { background-color: #1565c0; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(25, 118, 210, 0.4); }
+        .btn-save { background-color: #1976d2; color: white; width: 100%; padding: 16px; font-size: 1.2rem; border: none; margin-top: 10px; }
+        .card-table { background: #fff; border-radius: 12px; padding: 1px; color: #333; }
+        table { border-collapse: collapse; width: 100%; }
+        th { background-color: #0d47a1; color: white; padding: 16px; text-align: left; }
+        td { padding: 12px 16px; border-bottom: 1px solid #e0e0e0; }
+        input[type="text"] { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; }
+        .barcode { display: block; margin: auto; height: 35px; }
+        .instructions { background: rgba(255, 255, 255, 0.1); padding: 20px 25px; border-radius: 12px; margin-bottom: 30px; border-left: 5px solid #ffb300; backdrop-filter: blur(5px); }
+        .instructions p { margin-bottom: 8px; font-size: 1.05rem; line-height: 1.5; opacity: 0.9; }
+        .instructions p:last-child { margin-bottom: 0; }
+        .warning-text { color: #ffcc80; font-weight: bold; letter-spacing: 0.5px; }
+        .footer { text-align: center; margin-top: 40px; color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; }
     </style>
 </head>
 <body>
-
+<div class="container">
     <div class="header-container">
         <h2>Assign Card Names</h2>
-        <a href="?logout=1" class="logout-btn">Log Out</a>
+        <a href="?logout=1" class="btn btn-logout">Log Out</a>        
     </div>
 
-    <p>Update the names below to replace the _UNASSIGNED values</p>
-    <p>When done, scroll to the bottom and click on "Save Changes"</p>
-    <p>WARNING! HANDLE WITH CARE! CHECK TWICE BEFORE SAVING!</p>
-    <p>When clicking on "Save Changes" at the bottom ALL VALUES will be updated!</p>
-    <p>This page will timeout in 2 minutes</p>
+    <div class="instructions">
+        <p>Update the names below to replace any <strong>_UNASSIGNED</strong> values. Scroll to the bottom to "Save Changes".</p>
+        <p>When clicking "Save Changes" all values currently on the screen will be written to the database.</p>
+        <p class="warning-text">⚠️ WARNING: Handle with care! Check twice before saving.</p>
+        <p style="font-size: 0.85rem; margin-top: 10px; opacity: 0.7;">🔒 For security, this session will automatically time out after 2 minutes of inactivity.</p>
+    </div>
+
+    <?= $message ?>
+    <!-- Sorting Toggle -->
+    <div class="sort-nav">
+        Sort by: 
+        <a href="?" class="<?= (!isset($_GET['sort'])) ? 'active' : '' ?>">Physical Order</a>
+        <a href="?sort=name" class="<?= (isset($_GET['sort']) && $_GET['sort'] === 'name') ? 'active' : '' ?>">Employee Name</a>
+    </div>
 
     <?= $message ?>
 
     <form method="POST">
-        <table>
-            <tr>
-                <th>Card ID</th>
-                <th>Employee</th>
-                <th style="text-align: center;">Barcode</th> </tr>
-            <?php foreach ($csv_data as $card_id => $name): ?>
-            <tr>
-                <td><?= htmlspecialchars($card_id) ?></td>
-                <td>
-                    <input type="text" 
-                           name="cards[<?= htmlspecialchars($card_id) ?>]" 
-                           value="<?= htmlspecialchars($name) ?>">
-                </td>
-                <td style="text-align: center;">
-                    <svg class="barcode" data-code="<?= htmlspecialchars($card_id) ?>"></svg>
-                </td>
-            </tr>
-            <?php endforeach; ?>
-        </table>
-        <button type="submit">Save Changes</button>
+        <div class="card-table">
+            <table>
+                <tr>
+                    <th style="width: 25%;">Card ID</th>
+                    <th style="width: 45%;">Employee Name</th>
+                    <th style="text-align: center; width: 30%;">Barcode</th> 
+                </tr>
+                <?php foreach ($rows as $row): ?>
+                <tr>
+                    <td><code><?= htmlspecialchars($row['CardID']) ?></code></td>
+                    <td>
+                        <input type="text" name="cards[<?= $row['id'] ?>][CardID]" value="<?= htmlspecialchars($row['CardID']) ?>" style="display:none;">
+                        <input type="text" name="cards[<?= $row['id'] ?>][Name]" value="<?= htmlspecialchars($row['Name']) ?>">
+                    </td>
+                    <td style="text-align: center;"><svg class="barcode" data-code="<?= htmlspecialchars($row['CardID']) ?>"></svg></td>
+                </tr>
+                <?php endforeach; ?>
+            </table>
+        </div>
+        <button type="submit" class="btn btn-save">Save Changes</button>
     </form>
+    <br>
+    <div class="footer">
+            'PiClock' NFC Timestamp Viewer <span style="display: inline-block; transform: rotateY(180deg);">&copy;</span>2025-<?php echo date('Y');?> made with &hearts; by F.Javier "<a href="mailto:habiwan@me.com" style="color: #fff;">habiwan</a>" Puig Diaz
+    </div>
+</div>
 
-    <script src="JsBarcode.all.min.js"></script>
-
-    <script>
-        // 1. Initialize Barcodes
+<script src="JsBarcode.all.min.js" defer></script>
+<script>
+    window.addEventListener('load', function() {
         document.querySelectorAll('.barcode').forEach(function(element) {
             const code = element.getAttribute('data-code');
-            JsBarcode(element,"LOGIN|staff-" + code, {
-                format: "CODE128",
-                width: 1.5,
-                height: 35,
-                displayValue: false, // Prevents printing the text below the barcode
-                margin: 5
-            });
+            try { JsBarcode(element, code, {format: "CODE128", width: 1.5, height: 35, displayValue: false, margin: 5}); } 
+            catch (e) { console.error("Barcode failed", e); }
         });
-
-        // 2. Idle Timeout Script
-        (function() {
-            const timeoutDuration = 120000; // 120 seconds in milliseconds (fixed from 20 seconds)
-            let idleTimer;
-
-            function resetTimer() {
-                clearTimeout(idleTimer);
-                idleTimer = setTimeout(logoutUser, timeoutDuration);
-            }
-
-            function logoutUser() {
-                // Redirect user to logout execution parameter with a reason string attached
-                window.location.href = window.location.pathname + "?reason=timeout";
-            }
-
-            // Monitor continuous explicit interactions across the DOM space
-            window.onload = resetTimer;
-            document.onmousemove = resetTimer;
-            document.onkeypress = resetTimer;
-            document.onmousedown = resetTimer; 
-            document.ontouchstart = resetTimer;
-            document.onclick = resetTimer;
-            document.onscroll = resetTimer;
-        })();
-    </script>
-
+    });
+    
+    (function() {
+        const timeoutDuration = 120000;
+        let idleTimer;
+        function resetTimer() { clearTimeout(idleTimer); idleTimer = setTimeout(logoutUser, timeoutDuration); }
+        function logoutUser() { window.location.href = window.location.pathname + "?reason=timeout"; }
+        window.onload = resetTimer; document.onmousemove = resetTimer; document.onkeypress = resetTimer;
+    })();
+</script>
 </body>
 </html>
