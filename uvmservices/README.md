@@ -13,3 +13,6 @@ The only service that I ended up wanting on my setup was to use the avahi capabi
 a "nickname" like e.g. http://piclock.local or just simple http://piclock works for me too...
 
 At the same time it keeps your original "uvm" hostname endpoint alive, up to you if you want this or not...
+
+
+UPDATE: modified so it runs on a Pi itself too... if you can run docker on the pi you can install Portainer and use this new lamp stack
