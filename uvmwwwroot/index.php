@@ -101,7 +101,7 @@ if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
         </form>
     </div>
     <div class="footer">
-        'PiClock' NFC Timestamp Viewer <span style="display: inline-block; transform: rotateY(180deg);">&copy;</span>2025-<?php echo date('Y');?> made with &hearts; by F.Javier "<a href="mailto:habiwan@me.com" style="color: #fff;">habiwan</a>" Puig Diaz
+        'PiClock' NFC Timestamp Viewer <span style="display: inline-block; transform: rotateY(180deg);">&copy;</span> 2025-<?php echo date('Y');?><br>made with &hearts; by F.Javier "<a href="mailto:habiwan@me.com" style="color: #fff;">habiwan</a>" Puig Diaz
     </div>
 </body>
 </html>
@@ -126,7 +126,7 @@ if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
         header p { font-size: 1.2rem; opacity: 0.9; }
         
         .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 20px; }
-        .search-box { flex: 1; min-width: 300px; max-width: 450px; }
+        .search-box { flex: 1; min-width: 150px; max-width: 250px; }
         .search-box input { width: 100%; padding: 14px 20px; border-radius: 50px; border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.15); color: white; font-size: 1rem; }
         .search-box input:focus { outline: none; background: rgba(255, 255, 255, 0.25); border-color: #64b5f6; }
         
@@ -165,14 +165,9 @@ if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>'PiClock' NFC System</h1>
-            <p>Punchcard-System replacement</p>
-        </header>
-                
         <div class="controls">
             <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Search employees or card IDs...">
+                <input type="text" id="searchInput" placeholder="Search employee or Card ID">
             </div>
             <div class="date-filters">
                 <div class="date-group">
@@ -193,12 +188,9 @@ if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
         
         <div class="timeline-container" id="live-data">
             </div>
-        
-        <div class="footer">
-            'PiClock' NFC Timestamp Viewer <span style="display: inline-block; transform: rotateY(180deg);">&copy;</span>2025-<?php echo date('Y');?> made with &hearts; by F.Javier "<a href="mailto:habiwan@me.com" style="color: #fff;">habiwan</a>" Puig Diaz
-        </div>
+    <div class="footer">
+        'PiClock' NFC Timestamp Viewer <span style="display: inline-block; transform: rotateY(180deg);">&copy;</span> 2025-<?php echo date('Y');?><br>made with &hearts; by F.Javier "<a href="mailto:habiwan@me.com" style="color: #fff;">habiwan</a>" Puig Diaz
     </div>
-
     <script>
         // --- FILTER LOGIC ---
         function filterDashboard() {

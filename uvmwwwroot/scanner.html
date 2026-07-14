@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<title>NFC Scanner</title>
+<link rel="icon" href="favicon.png" type="image/png">
+<head>
+    <link rel="manifest" href="manifest.json">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <style>
+        /* Force full screen height */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            touch-action: none;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            background-attachment: fixed; /* Keeps gradient solid */
+        }
+        body { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            text-align: center;
+            color: white;
+        }
+        #display-area { padding: 20px; width: 90%; }
+        
+        .name { 
+            font-size: clamp(2rem, 8vw, 6rem); 
+            font-weight: 800; 
+            margin: 0; 
+            line-height: 1.1;
+            word-wrap: break-word;
+            min-height: 1.2em;
+        }
+        .time { 
+            font-size: clamp(1rem, 4vw, 2.5rem); 
+            opacity: 0.8; 
+            margin-top: 20px;
+            min-height: 1.5em;
+        }
+        
+        button { 
+            font-size: 1.5rem; 
+            padding: 20px 40px; 
+            border-radius: 15px; 
+            border: none; 
+            cursor: pointer; 
+            background: #fff;
+            color: #1e3c72;
+            font-weight: bold;
+            margin-top: 40px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: transform 0.1s;
+        }
+        button:active { transform: scale(0.95); }
+        
+        .footer {
+            position: absolute;
+            bottom: 10px;
+            font-size: 0.7rem;
+            opacity: 0.6;
+            text-align: center;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<div id="display-area">
+    <div id="name-display" class="name"></div>
+    <div id="time-display" class="time"></div>
+    <button id="scan-btn" onclick="startScan()">Start NFC Scanner</button>
+</div>
+
+<div class="footer">
+    Android Chrome NFC Scanner for 'PiClock' <span style="display: inline-block; transform: rotateY(180deg);">&copy;</span> 2026<br>made with &hearts; by F.Javier "<a href="mailto:habiwan@me.com" style="color: #fff;">habiwan</a>" Puig Díaz
+</div>
+
+<script>
+async function startScan() {
+    const btn = document.getElementById('scan-btn');
+    const nameDisplay = document.getElementById('name-display');
+    const timeDisplay = document.getElementById('time-display');
+
+    // 1. Check if the API exists at all
+    if (!('NDEFReader' in window)) {
+        nameDisplay.innerText = "Browser Error";
+        timeDisplay.innerText = "NFC not supported or not on HTTPS.";
+        return;
+    }
+
+    try {
+        const ndef = new NDEFReader();
+        await ndef.scan();
+        
+        btn.innerText = "Scanning...";
+        btn.disabled = true;
+        nameDisplay.innerText = "Ready to Tap...";
+        timeDisplay.innerText = "";
+
+        ndef.onreading = async (event) => {
+            const uid = event.serialNumber;
+            const response = await fetch('log_swipe.php', {
+                method: 'POST',
+                body: JSON.stringify({ uid: uid })
+            });
+            const data = await response.json();
+            
+            nameDisplay.innerText = data.name;
+            timeDisplay.innerText = "Logged at " + data.time;
+        };
+    } catch (error) {
+        if (error.name === "InvalidStateError") {
+            nameDisplay.innerText = "Already Scanning!";
+        } else {
+            console.error(error);
+            nameDisplay.innerText = "Scanner Error";
+            timeDisplay.innerText = error.message;
+        }
+    }
+}
+</script>
+</body>
+</html>

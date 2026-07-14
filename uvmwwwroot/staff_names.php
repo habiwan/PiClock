@@ -103,7 +103,7 @@ if (!isset($_SESSION['MANAGEMENT_PASSWORD_authenticated']) || $_SESSION['MANAGEM
         </form>
     </div>
     <div class="footer">
-        'PiClock' NFC Timestamp Viewer <span style="display: inline-block; transform: rotateY(180deg);">&copy;</span>2025-<?php echo date('Y');?> made with &hearts; by F.Javier "<a href="mailto:habiwan@me.com" style="color: #fff;">habiwan</a>" Puig Diaz
+        'PiClock' NFC Timestamp Manager <span style="display: inline-block; transform: rotateY(180deg);">&copy;</span> 2025-<?php echo date('Y');?><br>made with &hearts; by F.Javier "<a href="mailto:habiwan@me.com" style="color: #fff;">habiwan</a>" Puig Diaz
     </div>
 </body>
 </html>
@@ -198,12 +198,14 @@ $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="card-table">
             <table>
                 <tr>
-                    <th style="width: 25%;">Card ID</th>
-                    <th style="width: 45%;">Employee Name</th>
+                    <th style="width: 10%;">ID</th>
+                    <th style="width: 20%;">Card ID</th>
+                    <th style="width: 40%;">Employee Name</th>
                     <th style="text-align: center; width: 30%;">Barcode</th> 
                 </tr>
                 <?php foreach ($rows as $row): ?>
                 <tr>
+                    <td><code><?= htmlspecialchars($row['id']) ?></code></td>
                     <td><code><?= htmlspecialchars($row['CardID']) ?></code></td>
                     <td>
                         <input type="text" name="cards[<?= $row['id'] ?>][CardID]" value="<?= htmlspecialchars($row['CardID']) ?>" style="display:none;">
@@ -216,9 +218,8 @@ $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
         <button type="submit" class="btn btn-save">Save Changes</button>
     </form>
-    <br>
     <div class="footer">
-            'PiClock' NFC Timestamp Viewer <span style="display: inline-block; transform: rotateY(180deg);">&copy;</span>2025-<?php echo date('Y');?> made with &hearts; by F.Javier "<a href="mailto:habiwan@me.com" style="color: #fff;">habiwan</a>" Puig Diaz
+        'PiClock' NFC Timestamp Manager <span style="display: inline-block; transform: rotateY(180deg);">&copy;</span> 2025-<?php echo date('Y');?><br>made with &hearts; by F.Javier "<a href="mailto:habiwan@me.com" style="color: #fff;">habiwan</a>" Puig Diaz
     </div>
 </div>
 
