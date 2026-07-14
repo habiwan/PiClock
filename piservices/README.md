@@ -1,10 +1,16 @@
-Use this folder as an example of what services you should install in your pi
+Use this folder as an example of what services you should install in your pi:
 
-in my example I run the services on this folder on the pi so they run in term the shell scripts
+- Docker (install Portainer too)
+- avahi-alias (optional - create a hostname alias for LAN testing)
+- clockpy.service (this runs the nfc script in memory ready to be read)
+- emptycards.service (used initially to write a csv file with all NFC codes in it)
+- nfc-sync.service (when NFS card swiped on pi-NFC-reader it copies csv files across NAS and www machine - obsolete)
+
+During prototyping I ran the services on this folder on the pi so they run in term the shell scripts
 
 as you can see from the nfc folder... subject to your own opinion / implementation...
 
-UPDATE: the latest version could be run on the same pi via docker Portainer lamp stack:
+UPDATE: the latest version can be run on the same pi via docker Portainer lamp stack:
 
 Optional services you could run on your machine that runs the webapp.
 
