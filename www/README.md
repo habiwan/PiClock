@@ -11,3 +11,5 @@ names.csv and times.csv here
 (I also pi-mounted a "NAS" wannabe... horrible consumer grade WD MyCloud for backups)
 
 EDIT: Added barcode for the staff names managment table in case unique barcodes wanted to be scanned
+
+UPDATE: this now works on the same Pi with docker lamp Portainer stack (compose) - see uvmservices - and can also scan NFC cards with Chrome on Android via scanner.html. The two sample csv files can be imported to the mysql of the lamp with import-csv.php
