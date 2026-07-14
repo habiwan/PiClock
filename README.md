@@ -73,6 +73,8 @@ In my python script I added the sensor temp of the CPU for monitoring / troubesh
 
 The PC that hosts the webapp (a php page really running on mounted volume of a docker-compose-lamp installed on an UbuntuVM...) takes care of all the logic. The Excel only needs access to the NAS and also takes care of all the logic. As mentioned above, the pi uploads the names and times csv files to them when NFC cards are swiped...
 
+UPDATE: for testing I added scanner.html to www that used on a Chrome on an Android phone can be used to swipe cards and write the timstamps and card code to the mysql in the lamp docker composer portainer stack. However, for securuty reasons this needs to run via https. I used my vpnstack with duckdns to sign free let's encrypt certificates to make it work. 
+
 EDIT: Added roadmap in TODO.md for hardening. First a ban2fail implementation should be in place though... also added Barcode support on the staff names mgmt.
 
 Prototyped, Proyected and Created by F.Javier "habiwan" Puig Diaz (https://github.com/habiwan).
