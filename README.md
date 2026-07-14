@@ -75,6 +75,18 @@ The PC that hosts the webapp (a php page really running on mounted volume of a d
 
 UPDATE: for testing I added scanner.html to www that used on a Chrome on an Android phone can be used to swipe cards and write the timstamps and card code to the mysql in the lamp docker composer portainer stack. However, for securuty reasons this needs to run via https. I used my vpnstack with duckdns to sign free let's encrypt certificates to make it work. 
 
+<img width="407" height="557" alt="image" src="https://github.com/user-attachments/assets/3fdf4afa-1f0e-4e88-a2d5-e9f6e8f685e1" />
+
+<img width="1231" height="361" alt="image" src="https://github.com/user-attachments/assets/ecfd9fc7-a202-4675-acae-8fcda3e8bc23" />
+
+<img width="416" height="565" alt="image" src="https://github.com/user-attachments/assets/21b6fd85-42ad-4c28-9a07-1ccf4f447ff6" />
+
+<img width="1029" height="438" alt="image" src="https://github.com/user-attachments/assets/3eeb75ea-b801-4ac6-8e66-beec9ed6bb6f" />
+<img width="1018" height="225" alt="image" src="https://github.com/user-attachments/assets/2b5d01fd-7252-48ff-bb16-0833db5e9d76" />
+
+<img width="348" height="346" alt="image" src="https://github.com/user-attachments/assets/b2e1eb20-a1f4-4f9e-b876-f32499481a54" />
+
+
 EDIT: Added roadmap in TODO.md for hardening. First a ban2fail implementation should be in place though... also added Barcode support on the staff names mgmt.
 
 Prototyped, Proyected and Created by F.Javier "habiwan" Puig Diaz (https://github.com/habiwan).
