@@ -52,6 +52,7 @@ if (!isset($_SESSION['MANAGEMENT_PASSWORD_authenticated']) || $_SESSION['MANAGEM
 <html>
 <head>
     <title>Management Login</title>
+    <link rel="icon" href="favicon.png" type="image/png">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         
@@ -141,6 +142,7 @@ $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <html>
 <head>
     <title>Manage NFC Cards</title>
+    <link rel="icon" href="favicon.png" type="image/png">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background: linear-gradient(180deg, #1c3344, #102a33, #000000); min-height: 100vh; padding: 40px 20px; color: #fff; }
