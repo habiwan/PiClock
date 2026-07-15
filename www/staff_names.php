@@ -4,7 +4,7 @@ session_start();
 
 // 1. CHOOSE YOUR MANAGEMENT PASSWORD HERE:
 define('MANAGEMENT_PASSWORD', 'SuperSecurePassword'); 
-define('MANAGEMENT_TIMEOUT_SECONDS', 120); // Inactivity threshold
+define('MANAGEMENT_TIMEOUT_SECONDS', 7200); // Inactivity threshold
 
 // Handle Explicit Logout
 if (isset($_GET['logout'])) {
@@ -45,7 +45,7 @@ if (isset($_GET['reason']) && $_GET['reason'] === 'timeout') {
 if (!isset($_SESSION['MANAGEMENT_PASSWORD_authenticated']) || $_SESSION['MANAGEMENT_PASSWORD_authenticated'] !== true) {
     $display_msg = "Management Access";
     if (isset($_GET['reason']) && $_GET['reason'] === 'timeout') {
-        $login_error = "Logged out due to 2 minutes of inactivity.";
+        $login_error = "Logged out due to inactivity.";
     }
     ?>
     <!DOCTYPE html>
@@ -178,10 +178,10 @@ $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
     <div class="instructions">
-        <p>Update the names below to replace any <strong>_UNASSIGNED</strong> values. Scroll to the bottom to "Save Changes".</p>
-        <p>When clicking "Save Changes" all values currently on the screen will be written to the database.</p>
-        <p class="warning-text">⚠️ WARNING: Handle with care! Check twice before saving.</p>
-        <p style="font-size: 0.85rem; margin-top: 10px; opacity: 0.7;">🔒 For security, this session will automatically time out after 2 minutes of inactivity.</p>
+        <p>To update the employee names use the fields below to rename each NFC Card. 
+	<br>Then scroll to the bottom and click "Save Changes".</p>
+        <p class="warning-text">⚠️  WARNING: "Save Changes" writes ALL VALUES to the database!</p>
+        <p style="font-size: 0.85rem; margin-top: 10px; opacity: 0.7;">🔒 For security, this session will automatically time out after 2 hours of inactivity.</p>
     </div>
 
     <?= $message ?>

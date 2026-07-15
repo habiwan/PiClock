@@ -46,7 +46,7 @@ if (isset($_GET['reason']) && $_GET['reason'] === 'timeout') {
 if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
     $display_msg = "Staff Access";
     if (isset($_GET['reason']) && $_GET['reason'] === 'timeout') {
-        $login_error = "Logged out due to 24 hours of inactivity.";
+        $login_error = "Logged out due to inactivity.";
     }
     ?>
 <!DOCTYPE html>
