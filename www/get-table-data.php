@@ -42,6 +42,7 @@ while ($row = $stmt->fetch()) {
         
         $combinedData[] = [
             'year' => (int)date('Y', $timeObj),
+            'iso_year' => (int)date('o', $timeObj), // Added ISO year for accurate week calculation
             'week' => (int)date('W', $timeObj),
             'date_only' => date('Y-m-d', $timeObj),
             'formatted_day' => date('l - M j, Y', $timeObj), 
@@ -65,7 +66,8 @@ if (!empty($combinedData)) {
 /** 4. GROUP DATA **/
 $groupedData = [];
 foreach ($combinedData as $row) {
-    $dayKey = $row['date_only'] . '|' . $row['formatted_day'] . '|' . $row['week'] . '|' . $row['year'];
+    // Included ISO year in the grouping key for accurate Week math
+    $dayKey = $row['date_only'] . '|' . $row['formatted_day'] . '|' . $row['week'] . '|' . $row['year'] . '|' . $row['iso_year'];
     $empKey = $row['card'];
     
     if (!isset($groupedData[$dayKey])) $groupedData[$dayKey] = [];
@@ -82,15 +84,33 @@ foreach ($combinedData as $row) {
 
 /** 5. OUTPUT HTML **/
 foreach ($groupedData as $dayKey => $employees) {
-    list($dateOnly, $formattedDay, $weekNum, $yearNum) = explode('|', $dayKey);
+    list($dateOnly, $formattedDay, $weekNum, $yearNum, $isoYear) = explode('|', $dayKey);
+    
+    // Calculate exact start and end dates for the week number
+    $dto = new DateTime();
+    $dto->setISODate((int)$isoYear, (int)$weekNum);
+    $weekStart = $dto->format('Y-m-d'); // Monday
+    $dto->modify('+6 days');
+    $weekEnd = $dto->format('Y-m-d'); // Sunday
+
     echo '<div class="day-card" data-date="' . $dateOnly . '">';
-    echo '<div class="day-header"><div class="day-title">' . htmlspecialchars($formattedDay) . '</div><div class="day-meta"><span class="year">' . $yearNum . '</span> <span class="week">Wk ' . $weekNum . '</span></div></div>';
+    echo '<div class="day-header">';
+    echo '<div class="day-title">' . htmlspecialchars($formattedDay) . '</div>';
+    echo '<div class="day-meta">';
+    echo '<span class="year" data-year="' . $yearNum . '">' . $yearNum . '</span> ';
+    // Injected the start/end dates into data attributes for JS to read
+    echo '<span class="week" data-start="' . $weekStart . '" data-end="' . $weekEnd . '">Wk ' . $weekNum . '</span>';
+    echo '</div></div>';
+    
     echo '<div class="day-content">';
     foreach ($employees as $empCard => $empInfo) {
         echo '<div class="employee-row" data-name="' . htmlspecialchars(strtolower($empInfo['name'])) . '" data-card="' . htmlspecialchars(strtolower($empInfo['card'])) . '">';
         echo '<div class="employee-info"><div class="avatar" style="' . (!$empInfo['is_matched'] ? 'background: #b0bec5;' : '') . '">' . htmlspecialchars(substr($empInfo['name'], 0, 1)) . '</div>';
+        
         echo '<div><div>' . ($empInfo['is_matched'] ? '<span class="employee-name">' . htmlspecialchars($empInfo['name']) . '</span>' : '<span class="badge-unknown">Unknown Card</span>') . '</div>';
-        echo '<div class="card-id-sub">ID: <code>' . htmlspecialchars($empInfo['card']) . '</code></div></div></div>';
+        // Added 'click-id' class to the code block
+        echo '<div class="card-id-sub">ID: <code class="click-id">' . htmlspecialchars($empInfo['card']) . '</code></div></div></div>';
+        
         echo '<div class="punch-times">';
         foreach ($empInfo['punches'] as $punch) { echo '<span class="time-badge">' . htmlspecialchars($punch) . '</span>'; }
         echo '</div></div>';

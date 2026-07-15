@@ -168,6 +168,15 @@ if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
         .table-header { display: flex; justify-content: space-between; padding: 15px 25px; background: #0d47a1; color: white; font-weight: 500; border-radius: 12px; margin-bottom: 15px; position: relative; z-index: 2; }
         .table-header a, .table-header a:link, .table-header a:visited { color: #ffffffff !important; text-decoration: none; cursor: default; }
         .footer { text-align: center; margin-top: 40px; color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; }
+
+        /* ADDED: Visual Cues for Interactive filtering elements */
+        .day-title, .year, .week, .employee-name, code.click-id, .badge-unknown {
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+        .day-title:hover, .year:hover, .week:hover, .employee-name:hover, code.click-id:hover, .badge-unknown:hover {
+            opacity: 0.6;
+        }
     </style>
 </head>
 <body>
@@ -208,6 +217,79 @@ if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
             }, { once: true });
         });
 
+        // --- INTERACTIVE CLICK LISTENERS ---
+        document.getElementById('live-data').addEventListener('click', function(e) {
+            const searchInput = document.getElementById('searchInput');
+            const startDateInput = document.getElementById('startDate');
+            const endDateInput = document.getElementById('endDate');
+
+            // 1. Employee Name or ID or Unknown Badge
+            const clickedName = e.target.closest('.employee-name') || e.target.closest('.click-id') || e.target.closest('.badge-unknown');
+            if (clickedName) {
+                let textToSearch = clickedName.textContent.trim();
+                
+                // Toggle off if already searching this exact text
+                if (searchInput.value === textToSearch) {
+                    searchInput.value = ''; 
+                } else {
+                    searchInput.value = textToSearch;
+                }
+                filterDashboard();
+            }
+
+            // 2. Day Title
+            const clickedDay = e.target.closest('.day-title');
+            if (clickedDay) {
+                const d = clickedDay.closest('.day-card').dataset.date;
+                
+                // Toggle off if already filtered to this exact day
+                if (startDateInput.value === d && endDateInput.value === d) {
+                    startDateInput.value = '';
+                    endDateInput.value = '';
+                } else {
+                    startDateInput.value = d;
+                    endDateInput.value = d;
+                }
+                filterDashboard();
+            }
+
+            // 3. Year
+            const clickedYear = e.target.closest('.year');
+            if (clickedYear) {
+                const y = clickedYear.dataset.year;
+                const startY = y + '-01-01';
+                const endY = y + '-12-31';
+                
+                // Toggle off if already filtered to this exact year
+                if (startDateInput.value === startY && endDateInput.value === endY) {
+                    startDateInput.value = '';
+                    endDateInput.value = '';
+                } else {
+                    startDateInput.value = startY;
+                    endDateInput.value = endY;
+                }
+                filterDashboard();
+            }
+
+            // 4. Week
+            const clickedWeek = e.target.closest('.week');
+            if (clickedWeek) {
+                const startWk = clickedWeek.dataset.start;
+                const endWk = clickedWeek.dataset.end;
+                
+                // Toggle off if already filtered to this exact week
+                if (startDateInput.value === startWk && endDateInput.value === endWk) {
+                    startDateInput.value = '';
+                    endDateInput.value = '';
+                } else {
+                    startDateInput.value = startWk;
+                    endDateInput.value = endWk;
+                }
+                filterDashboard();
+            }
+        });
+
+
         // --- FILTER LOGIC ---
         function filterDashboard() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
@@ -236,7 +318,8 @@ if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
                     const empName = row.getAttribute('data-name');
                     const empCard = row.getAttribute('data-card');
                     
-                    const textMatches = empName.includes(searchTerm) || empCard.includes(searchTerm);
+                    const textMatches = empName.includes(searchTerm) || empCard.includes(searchTerm) || 
+                                      (searchTerm === 'unknown card' && row.querySelector('.badge-unknown'));
                     
                     if (textMatches) {
                         row.style.display = '';
