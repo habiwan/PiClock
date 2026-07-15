@@ -88,6 +88,13 @@ if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
         /* 3. Footer stays at the bottom */
         .footer { text-align: center; padding-bottom: 20px; color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; }
     </style>
+    <script>
+        function requestFS() {
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen().catch(err => {});
+            }
+        }
+    </script>
 </head>
 <body>
     <div class="login-box">
@@ -95,7 +102,7 @@ if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
         <?php if (isset($login_error)): ?>
             <div class="error"><?= htmlspecialchars($login_error) ?></div>
         <?php endif; ?>
-        <form method="POST" autocomplete="off">
+        <form method="POST" autocomplete="off" onsubmit="requestFS()">
             <input type="password" name="x_secure_token" placeholder="Enter Password" autocomplete="new-password" required autofocus>
             <button type="submit">Log In</button>
         </form>
@@ -192,6 +199,15 @@ if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
         'PiClock' NFC Timestamp Viewer <span style="display: inline-block; transform: rotateY(180deg);">&copy;</span> 2025-<?php echo date('Y');?><br>made with &hearts; by F.Javier "<a href="mailto:habiwan@me.com" style="color: #fff;">habiwan</a>" Puig Diaz
     </div>
     <script>
+        // Safety net to re-enable fullscreen if lost
+        window.addEventListener('load', function() {
+            document.body.addEventListener('click', function() {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(err => {});
+                }
+            }, { once: true });
+        });
+
         // --- FILTER LOGIC ---
         function filterDashboard() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();

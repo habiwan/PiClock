@@ -16,8 +16,7 @@ if (isset($_GET['logout'])) {
 
 // Handle Login Form Submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['x_secure_token'])) {
-    if ($_POST['x_secure_token'] === MANAGEMENT_PASSWORD) {
-        $_SESSION['MANAGEMENT_PASSWORD_authenticated'] = true;
+    if ($_POST['x_secure_token'] === MANAGEMENT_PASSWORD) {$_SESSION['MANAGEMENT_PASSWORD_authenticated'] = true;
         $_SESSION['MANAGEMENT_last_activity'] = time();
         header("Location: " . $_SERVER['PHP_SELF']);
         exit;
@@ -27,8 +26,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['x_secure_token'])) {
 }
 
 // Server-Side Inactivity Check
-if (isset($_SESSION['MANAGEMENT_PASSWORD_authenticated']) && $_SESSION['MANAGEMENT_PASSWORD_authenticated'] === true) {
-    if (isset($_SESSION['MANAGEMENT_last_activity']) && (time() - $_SESSION['MANAGEMENT_last_activity'] > MANAGEMENT_TIMEOUT_SECONDS)) {
+if (isset($_SESSION['MANAGEMENT_PASSWORD_authenticated']) &&$_SESSION['MANAGEMENT_PASSWORD_authenticated'] === true) {
+    if (isset($_SESSION['MANAGEMENT_last_activity']) && (time() -$_SESSION['MANAGEMENT_last_activity'] > MANAGEMENT_TIMEOUT_SECONDS)) {
         unset($_SESSION['MANAGEMENT_PASSWORD_authenticated']);
         unset($_SESSION['MANAGEMENT_last_activity']);
         header("Location: " . $_SERVER['PHP_SELF'] . "?reason=timeout");
@@ -37,15 +36,13 @@ if (isset($_SESSION['MANAGEMENT_PASSWORD_authenticated']) && $_SESSION['MANAGEME
     $_SESSION['MANAGEMENT_last_activity'] = time();
 }
 
-if (isset($_GET['reason']) && $_GET['reason'] === 'timeout') {
+if (isset($_GET['reason']) &&$_GET['reason'] === 'timeout') {
     unset($_SESSION['MANAGEMENT_PASSWORD_authenticated']);
     unset($_SESSION['MANAGEMENT_last_activity']);
 }
 
-if (!isset($_SESSION['MANAGEMENT_PASSWORD_authenticated']) || $_SESSION['MANAGEMENT_PASSWORD_authenticated'] !== true) {
-    $display_msg = "Management Access";
-    if (isset($_GET['reason']) && $_GET['reason'] === 'timeout') {
-        $login_error = "Logged out due to inactivity.";
+if (!isset($_SESSION['MANAGEMENT_PASSWORD_authenticated']) || $_SESSION['MANAGEMENT_PASSWORD_authenticated'] !== true) {$display_msg = "Management Access";
+    if (isset($_GET['reason']) && $_GET['reason'] === 'timeout') {$login_error = "Logged out due to inactivity.";
     }
     ?>
     <!DOCTYPE html>
@@ -90,6 +87,13 @@ if (!isset($_SESSION['MANAGEMENT_PASSWORD_authenticated']) || $_SESSION['MANAGEM
             font-size: 0.9rem; 
         }
     </style>
+    <script>
+        function requestFS() {
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen().catch(err => {});
+            }
+        }
+    </script>
 </head>
 <body>
     <div class="login-box">
@@ -97,7 +101,7 @@ if (!isset($_SESSION['MANAGEMENT_PASSWORD_authenticated']) || $_SESSION['MANAGEM
         <?php if (isset($login_error)): ?>
             <div class="error"><?= htmlspecialchars($login_error) ?></div>
         <?php endif; ?>
-        <form method="POST" autocomplete="off">
+        <form method="POST" autocomplete="off" onsubmit="requestFS()">
             <input type="password" name="x_secure_token" placeholder="Enter Password" required autofocus>
             <button type="submit">Secure Log In</button>
         </form>
@@ -111,10 +115,10 @@ if (!isset($_SESSION['MANAGEMENT_PASSWORD_authenticated']) || $_SESSION['MANAGEM
 }
 
 /** Database Connection **/
-$dbHost = 'db'; $dbName = 'lampapp'; $dbUser = 'root'; $dbPass = 'rootpassword';
+$dbHost = 'db';$dbName = 'lampapp'; $dbUser = 'root';$dbPass = 'rootpassword';
 
 try {
-    $pdo = new PDO("mysql:host=$dbHost;dbname=$dbName;charset=utf8mb4", $dbUser, $dbPass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+    $pdo = new PDO("mysql:host=$dbHost;dbname=$dbName;charset=utf8mb4", $dbUser,$dbPass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
 } catch (PDOException $e) { die("Database connection failed: " . $e->getMessage()); }
 
 $message = "";
@@ -123,20 +127,19 @@ $message = "";
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cards'])) {
     try {
         $pdo->beginTransaction();
-        $stmt = $pdo->prepare("UPDATE names SET CardID = ?, Name = ? WHERE id = ?");
+        $stmt =$pdo->prepare("UPDATE names SET CardID = ?, Name = ? WHERE id = ?");
         
-        foreach ($_POST['cards'] as $id => $data) {
-            $stmt->execute([trim($data['CardID']), trim($data['Name']), $id]);
+        foreach ($_POST['cards'] as $id =>$data) {
+            $stmt->execute([trim($data['CardID']), trim($data['Name']),$id]);
         }
-        $pdo->commit();
-        $message = "<div style='color: #81c784; background: rgba(129, 199, 132, 0.1); border: 1px solid #81c784; padding: 15px; border-radius: 8px; font-weight: bold; margin-bottom: 20px;'>Database updated successfully!</div>";
-    } catch (Exception $e) { $pdo->rollBack(); $message = "<div style='color: #e57373; border: 1px solid #e57373; padding: 15px; border-radius: 8px; margin-bottom: 20px;'>Error: " . $e->getMessage() . "</div>"; }
+        $pdo->commit();$message = "<div style='color: #81c784; background: rgba(129, 199, 132, 0.1); border: 1px solid #81c784; padding: 15px; border-radius: 8px; font-weight: bold; margin-bottom: 20px;'>Database updated successfully!</div>";
+    } catch (Exception $e) {$pdo->rollBack(); $message = "<div style='color: #e57373; border: 1px solid #e57373; padding: 15px; border-radius: 8px; margin-bottom: 20px;'>Error: " . $e->getMessage() . "</div>"; }
 }
 
 // 2. Fetch data with Sorting Logic
-$sort = (isset($_GET['sort']) && $_GET['sort'] === 'name') ? 'Name ASC' : 'id ASC';
-$stmt = $pdo->query("SELECT id, CardID, Name FROM names ORDER BY $sort");
-$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$sort = (isset($_GET['sort']) &&$_GET['sort'] === 'name') ? 'Name ASC' : 'id ASC';
+$stmt =$pdo->query("SELECT id, CardID, Name FROM names ORDER BY $sort");
+$rows =$stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html>
@@ -179,17 +182,16 @@ $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <div class="instructions">
         <p>To update the employee names use the fields below to rename each NFC Card. 
-	<br>Then scroll to the bottom and click "Save Changes".</p>
+    <br>Then scroll to the bottom and click "Save Changes".</p>
         <p class="warning-text">⚠️  WARNING: "Save Changes" writes ALL VALUES to the database!</p>
         <p style="font-size: 0.85rem; margin-top: 10px; opacity: 0.7;">🔒 For security, this session will automatically time out after 2 hours of inactivity.</p>
     </div>
 
-    <?= $message ?>
     <!-- Sorting Toggle -->
     <div class="sort-nav">
         Sort by: 
         <a href="?" class="<?= (!isset($_GET['sort'])) ? 'active' : '' ?>">Physical Order</a>
-        <a href="?sort=name" class="<?= (isset($_GET['sort']) && $_GET['sort'] === 'name') ? 'active' : '' ?>">Employee Name</a>
+        <a href="?sort=name" class="<?= (isset($_GET['sort']) &&$_GET['sort'] === 'name') ? 'active' : '' ?>">Employee Name</a>
     </div>
 
     <?= $message ?>
@@ -203,7 +205,7 @@ $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <th style="width: 40%;">Employee Name</th>
                     <th style="text-align: center; width: 30%;">Barcode</th> 
                 </tr>
-                <?php foreach ($rows as $row): ?>
+                <?php foreach ($rows as$row): ?>
                 <tr>
                     <td><code><?= htmlspecialchars($row['id']) ?></code></td>
                     <td><code><?= htmlspecialchars($row['CardID']) ?></code></td>
@@ -233,6 +235,13 @@ $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         });
     });
     
+    // Safety net to re-enable fullscreen if lost
+    document.body.addEventListener('click', function() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(err => {});
+        }
+    }, { once: true });
+
     (function() {
         const timeoutDuration = 120000;
         let idleTimer;

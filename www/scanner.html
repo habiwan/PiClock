@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <title>NFC Scanner</title>
 <link rel="icon" href="favicon.png" type="image/png">
@@ -69,7 +69,6 @@
     </style>
 </head>
 <body>
-
 <div id="display-area">
     <div id="name-display" class="name"></div>
     <div id="time-display" class="time"></div>
@@ -79,10 +78,14 @@
 <div class="footer">
     Android Chrome NFC Scanner for 'PiClock' <span style="display: inline-block; transform: rotateY(180deg);">&copy;</span> 2026<br>made with &hearts; by F.Javier "<a href="mailto:habiwan@me.com" style="color: #fff;">habiwan</a>" Puig Díaz
 </div>
-
 <script>
 async function startScan() {
     const btn = document.getElementById('scan-btn');
+    if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch(err => {
+            console.log(`Error attempting to enable full-screen: ${err.message}`);
+        });
+    }
     const nameDisplay = document.getElementById('name-display');
     const timeDisplay = document.getElementById('time-display');
 
@@ -92,7 +95,6 @@ async function startScan() {
         timeDisplay.innerText = "NFC not supported or not on HTTPS.";
         return;
     }
-
     try {
         const ndef = new NDEFReader();
         await ndef.scan();
@@ -125,4 +127,4 @@ async function startScan() {
 }
 </script>
 </body>
-</html>
+</html> 
