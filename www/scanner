@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<title>NFC Scanner</title>
+<link rel="icon" href="favicon.png" type="image/png">
+<head>
+    <link rel="manifest" href="manifest.json">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Import digital clock font -->
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        /* Global Reset */
+        * { box-sizing: border-box; }
+
+        /* Force full screen height */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            touch-action: none;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            background-attachment: fixed; /* Keeps gradient solid */
+        }
+        body { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            text-align: center;
+            color: white;
+        }
+        
+        /* Flex container */
+        #display-area { 
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%; 
+            padding: 20px; 
+            padding-bottom: 50px; /* Space for footer */
+        }
+        
+        /* Standard styling for the Employee Name */
+        .name { 
+            font-size: clamp(1.5rem, 8vw, 5rem); 
+            font-weight: 800; 
+            margin: 0; 
+            line-height: 1.1;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            hyphens: auto;
+            min-height: 1.2em;
+            width: 95%;
+            transition: all 0.2s ease;
+        }
+
+        /* Giant Dark Green Digital Clock Mode */
+        .clock-box {
+            font-family: 'Share Tech Mono', monospace;
+            background: linear-gradient(145deg, #1b5e20, #0d3312);
+            color: #ffffff;
+            border-radius: 30px;
+            width: 90%;
+            max-width: 700px;
+            padding: 4vh 2vw;
+            font-size: clamp(3.5rem, 18vw, 14rem); 
+            white-space: nowrap; 
+            font-weight: normal;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6), inset 0 0 15px rgba(255,255,255,0.1);
+            text-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            letter-spacing: 0.05em;
+            margin: 0 auto;
+        }
+        
+        .time { 
+            font-size: clamp(1rem, 4vw, 2.5rem); 
+            opacity: 0.8; 
+            margin-top: 20px;
+            min-height: 1.5em;
+        }
+        
+        button { 
+            font-size: 1.5rem; 
+            padding: 20px 40px; 
+            border-radius: 15px; 
+            border: none; 
+            cursor: pointer; 
+            background: #fff;
+            color: #1e3c72;
+            font-weight: bold;
+            margin-top: 40px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: transform 0.1s;
+        }
+        button:active { transform: scale(0.95); }
+        
+        .footer {
+            position: absolute;
+            bottom: 10px;
+            font-size: 0.7rem;
+            opacity: 0.6;
+            text-align: center;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<div id="display-area">
+    <div id="name-display" class="name"></div>
+    <div id="time-display" class="time"></div>
+    <button id="scan-btn" onclick="startScan()">Start NFC Scanner</button>
+</div>
+
+<div class="footer">
+    Android Chrome NFC Scanner for 'PiClock' <span style="display: inline-block; transform: rotateY(180deg);">&copy;</span> 2026<br>made with &hearts; by F.Javier "<a href="mailto:habiwan@me.com" style="color: #fff;">habiwan</a>" Puig Díaz
+</div>
+<script>
+let clockInterval;
+let resetTimeout;
+
+// --- Debounce & Data Trackers ---
+const lastSwipeTimes = new Map();
+const swipeNames = new Map();      // Remembers the person's name locally
+const swipeLogTimes = new Map();   // Remembers the exact time they logged
+const DEBOUNCE_MS = 60000; 
+
+// Function to display the live clock in HH:MM format
+function updateClock() {
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mm = String(now.getMinutes()).padStart(2, '0');
+    
+    const nameDisplay = document.getElementById('name-display');
+    nameDisplay.innerText = `${hh}:${mm}`;
+    nameDisplay.className = 'name clock-box'; 
+}
+
+async function startScan() {
+    const btn = document.getElementById('scan-btn');
+    if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch(err => {
+            console.log(`Error attempting to enable full-screen: ${err.message}`);
+        });
+    }
+    const nameDisplay = document.getElementById('name-display');
+    const timeDisplay = document.getElementById('time-display');
+
+    if (!('NDEFReader' in window)) {
+        nameDisplay.innerText = "Browser Error";
+        timeDisplay.innerText = "NFC not supported or not on HTTPS.";
+        return;
+    }
+    
+    try {
+        const ndef = new NDEFReader();
+        await ndef.scan();
+        
+        btn.style.display = 'none'; 
+        
+        updateClock();
+        clockInterval = setInterval(updateClock, 1000); 
+        timeDisplay.innerText = "";
+
+        ndef.onreading = async (event) => {
+            const uid = event.serialNumber;
+            const now = Date.now();
+
+            // --- Gentle Visual Debounce Logic ---
+            if (lastSwipeTimes.has(uid)) {
+                const timeSinceLastSwipe = now - lastSwipeTimes.get(uid);
+                
+                if (timeSinceLastSwipe < DEBOUNCE_MS) {
+                    // Fetch the cached name and time (defaults to "User" if it bounced in the very first millisecond)
+                    const cachedName = swipeNames.get(uid) || "User";
+                    const cachedTime = swipeLogTimes.get(uid) || "";
+                    
+                    // Stop clock & clear any existing timers
+                    clearInterval(clockInterval);
+                    clearTimeout(resetTimeout);
+                    
+                    nameDisplay.className = 'name'; 
+                    nameDisplay.innerText = cachedName;
+                    timeDisplay.innerText = `Already logged at ${cachedTime}. Please wait 60 seconds.`;
+                    
+                    // Revert back to clock after 4 seconds
+                    resetTimeout = setTimeout(() => {
+                        updateClock();
+                        clockInterval = setInterval(updateClock, 1000);
+                        timeDisplay.innerText = ""; 
+                    }, 4000);
+                    
+                    return; // Block the fetch request to the server
+                }
+            }
+            
+            // Record this swipe immediately to prevent multi-bounces while waiting for PHP
+            lastSwipeTimes.set(uid, now);
+            // -----------------------------------
+
+            const response = await fetch('log_swipe.php', {
+                method: 'POST',
+                body: JSON.stringify({ uid: uid })
+            });
+            const data = await response.json();
+            
+            // Cache the server's response so we can use it if they bounce again in the next 60s
+            swipeNames.set(uid, data.name);
+            swipeLogTimes.set(uid, data.time);
+            
+            clearInterval(clockInterval);
+            clearTimeout(resetTimeout);
+            
+            nameDisplay.className = 'name'; 
+            nameDisplay.innerText = data.name;
+            
+            // If the PHP script caught a duplicate (e.g., the browser was refreshed wiping the JS memory)
+            if (data.status === 'ignored') {
+                timeDisplay.innerText = `Already logged at ${data.time}. Please wait 60 seconds.`;
+            } else {
+                timeDisplay.innerText = "Logged at " + data.time;
+            }
+            
+            resetTimeout = setTimeout(() => {
+                updateClock();
+                clockInterval = setInterval(updateClock, 1000);
+                timeDisplay.innerText = ""; 
+            }, 4000);
+        };
+    } catch (error) {
+        if (error.name === "InvalidStateError") {
+            nameDisplay.innerText = "Already Scanning!";
+        } else {
+            console.error(error);
+            nameDisplay.className = 'name'; 
+            nameDisplay.innerText = "Scanner Error";
+            timeDisplay.innerText = error.message;
+        }
+    }
+}
+</script>
+</body>
+</html>
