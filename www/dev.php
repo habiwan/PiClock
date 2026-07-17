@@ -119,8 +119,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Ensure table exists first
                 $pdo->exec("CREATE TABLE IF NOT EXISTS names (
                     id INT AUTO_INCREMENT PRIMARY KEY,
-                    CardID VARCHAR(255) NOT NULL UNIQUE,
-                    name VARCHAR(255) DEFAULT NULL
+                    CardID VARCHAR(12) NOT NULL UNIQUE,
+                    name VARCHAR(100) DEFAULT NULL
                 )");
                 // Now restore
                 $pdo->exec("TRUNCATE TABLE names; INSERT INTO names SELECT * FROM names_backup;");
@@ -132,8 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 // Ensure table exists first
                 $pdo->exec("CREATE TABLE IF NOT EXISTS times (
-                    
-                    UID VARCHAR(255) NOT NULL,
+                    UID VARCHAR(12) NOT NULL,
                     temp FLOAT,
                     timestamp DATETIME
                 )");
