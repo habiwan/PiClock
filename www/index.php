@@ -55,12 +55,22 @@ if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
     <title>Staff Login</title>
     <link rel="icon" href="favicon.png" type="image/png">
     <style>
+        html {
+            -webkit-text-size-adjust: 100%;
+            touch-action: manipulation; /* Improves touch response */
+        }
+        /* Prevent iOS zoom on input focus */
+            input[type="text"], 
+            input[type="date"], 
+            input[type="password"] {
+                font-size: 16px !important; 
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         
         /* 1. Change body to flex-column */
         body { 
             background: linear-gradient(180deg, #1c3344, #102a33, #000000); 
-            min-height: 100vh; 
+            min-height: 100dvh; 
             display: flex; 
             flex-direction: column; 
             align-items: center; /* Keeps it centered horizontally */
@@ -87,6 +97,32 @@ if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
         
         /* 3. Footer stays at the bottom */
         .footer { text-align: center; padding-bottom: 20px; color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; }
+
+        /* Responsive adjustments for screens smaller than 600px */
+        @media (max-width: 600px) {
+            header h1 { 
+                /* Scales between 1.5rem and 2.8rem depending on screen width */
+                font-size: clamp(1.5rem, 5vw, 2.8rem); 
+                margin-bottom: 15px; 
+                text-shadow: 0 2px 10px rgba(0,0,0,0.3); 
+            }
+            header p { 
+                font-size: 1rem; 
+            }
+            .employee-name { 
+                font-size: 0.95rem; 
+            }
+            .time-badge { 
+                font-size: 0.8rem; 
+                padding: 4px 10px; 
+            }
+            .search-box { 
+                max-width: 100%; 
+            }
+            .controls { 
+                flex-direction: column; 
+            }
+        }
     </style>
     <script>
         function requestFS() {
@@ -121,15 +157,30 @@ if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PiClock Dashboard</title>
     <link rel="icon" href="favicon.png" type="image/png">
     <style>
+        html {
+            -webkit-text-size-adjust: 100%;
+            touch-action: manipulation; /* Improves touch response */
+        }
+        /* Prevent iOS zoom on input focus */
+        input[type="text"], 
+        input[type="date"], 
+        input[type="password"] {
+            font-size: 16px !important; 
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: linear-gradient(180deg, #1c3344, #102a33, #000000); min-height: 100vh; padding: 30px 20px; color: #fff; }
+        body { background: linear-gradient(180deg, #1c3344, #102a33, #000000); min-height: 100dvh; padding: 30px 20px; color: #fff; }
         .container { max-width: 1200px; margin: 0 auto; }
-        header { text-align: center; padding: 30px 0; margin-bottom: 30px; }
-        header h1 { font-size: 2.8rem; margin-bottom: 15px; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        header { text-align: center; padding: 5px 0; margin-bottom: 1px; }
+        header h1 { 
+            /* Scales between 1.5rem and 2.8rem depending on screen width */
+            font-size: clamp(1.5rem, 5vw, 2.8rem); 
+            margin-bottom: 15px; 
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3); 
+        }
         header p { font-size: 1.2rem; opacity: 0.9; }
         
         .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 20px; }
@@ -170,20 +221,79 @@ if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
         .footer { text-align: center; margin-top: 40px; color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; }
 
         /* ADDED: Visual Cues for Interactive filtering elements */
-        .day-title, .year, .week, .employee-name, code.click-id, .badge-unknown {
+        .day-title, .year, .week, .employee-name, .badge-unknown {
             cursor: pointer;
             transition: opacity 0.2s ease;
         }
-        .day-title:hover, .year:hover, .week:hover, .employee-name:hover, code.click-id:hover, .badge-unknown:hover {
+        .day-title:hover, .year:hover, .week:hover, .employee-name:hover, .badge-unknown:hover {
             opacity: 0.6;
+        }
+            /* Responsive adjustments for screens smaller than 600px */
+        @media (max-width: 600px) {
+            /* 1. Reclaim wasted screen space by reducing container padding */
+            body { 
+                padding: 15px 10px; 
+            }
+            
+            /* 2. Header and Search adjustments */
+            header h1 { 
+                font-size: clamp(1.5rem, 6vw, 2.2rem) !important; 
+                margin-bottom: 10px; 
+            }
+            header p { font-size: 1rem; }
+            .search-box { max-width: 100%; }
+            .controls { flex-direction: column; align-items: stretch; }
+            .date-filters { justify-content: space-between; }
+            
+            /* 3. Stack the Table Header */
+            .table-header { 
+                flex-direction: column; 
+                text-align: center; 
+                padding: 12px; 
+                gap: 10px; 
+            }
+            
+            /* 4. Stack the Day Header so dates don't wrap aggressively */
+            .day-header { 
+                flex-direction: column; 
+                align-items: flex-start; 
+                padding: 12px 15px; 
+                gap: 8px; 
+            }
+            .day-title { font-size: 1.1rem; }
+            
+            /* 5. Stack the Employee Rows so time badges drop to a new line */
+            .employee-row { 
+                flex-direction: column; 
+                align-items: flex-start; 
+                padding: 15px; 
+                gap: 12px; 
+            }
+            .employee-info { width: 100%; }
+            
+            /* 6. Allow time punches to take full width and align left under the name */
+            .punch-times { 
+                max-width: 100%; 
+                justify-content: flex-start; 
+                padding-left: 55px; /* Indents them nicely under the avatar */
+            }
+            .time-badge { 
+                font-size: 0.85rem; 
+                padding: 5px 12px; 
+            }
+            .employee-name { font-size: 1rem; }
         }
     </style>
 </head>
 <body>
     <div class="container">
+    <header>
+        <h1>'PiClock' NFC System</h1>
+        <p>custom made Punchcard-System replacement</p>
+    </header>
         <div class="controls">
             <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Search employee or Card ID">
+                <input type="text" id="searchInput" placeholder="🔎  Search">
             </div>
             <div class="date-filters">
                 <div class="date-group">
@@ -224,7 +334,7 @@ if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
             const endDateInput = document.getElementById('endDate');
 
             // 1. Employee Name or ID or Unknown Badge
-            const clickedName = e.target.closest('.employee-name') || e.target.closest('.click-id') || e.target.closest('.badge-unknown');
+            const clickedName = e.target.closest('.employee-name') || e.target.closest('.badge-unknown');
             if (clickedName) {
                 let textToSearch = clickedName.textContent.trim();
                 
@@ -316,10 +426,10 @@ if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
                 
                 rows.forEach(row => {
                     const empName = row.getAttribute('data-name');
-                    const empCard = row.getAttribute('data-card');
                     
-                    const textMatches = empName.includes(searchTerm) || empCard.includes(searchTerm) || 
-                                      (searchTerm === 'unknown card' && row.querySelector('.badge-unknown'));
+                    // Updated search logic
+                    const textMatches = empName.includes(searchTerm) || 
+                                    (searchTerm === 'unknown card' && row.querySelector('.badge-unknown'));
                     
                     if (textMatches) {
                         row.style.display = '';
