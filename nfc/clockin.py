@@ -12,12 +12,11 @@ but now I developed a php webapp with the same functionality and nicer look.
 Copyleft by F.Javier Puig Diaz, July 2026
 UPDATE: mysql for lamp usage (pip3 install mysql-connector-python first of course...)
 """
-
-importimport RPi.GPIO as GPIO
+import RPi.GPIO as GPIO
 import vcgencmd
 import mysql.connector
 from datetime import datetime
-from time import sleep
+import time # Imported time module directly for our debounce math
 from pn532 import *
 
 # --- DATABASE CONFIGURATION ---
@@ -28,12 +27,13 @@ db_config = {
     'database': 'lampapp'
 }
 
-def log_to_db(uid_hex, timestamp):
+# --- DEBOUNCE CONFIGURATION ---
+last_swipe_times = {}
+DEBOUNCE_SECONDS = 60
+
+def log_to_db(uid_str, timestamp):
     """Inserts the swipe event directly into MySQL."""
     try:
-        # Convert list of hex to a clean string, e.g., "0xAA 0xBB 0xCC"
-        uid_str = " ".join([hex(i) for i in uid_hex])
-        
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor()
         
@@ -61,7 +61,7 @@ if __name__ == '__main__':
 
         # Boot beep
         GPIO.output(buzzer, GPIO.HIGH)
-        sleep(0.1)
+        time.sleep(0.1)
         GPIO.output(buzzer, GPIO.LOW)
         
         print('Waiting for RFID/NFC card...')
@@ -70,18 +70,30 @@ if __name__ == '__main__':
             uid = pn532.read_passive_target(timeout=0.5)
             if uid is None:
                 continue
+            
+            # Convert list of hex to a clean string immediately
+            uid_str = " ".join([hex(i) for i in uid])
+            current_epoch = time.time()
+
+            # --- Per-Card Debounce Logic ---
+            if uid_str in last_swipe_times:
+                time_since_last = current_epoch - last_swipe_times[uid_str]
+                if time_since_last < DEBOUNCE_SECONDS:
+                    # Ignore the card if it was swiped less than 60 seconds ago
+                    continue 
+            
+            # Record the new swipe time for this specific card
+            last_swipe_times[uid_str] = current_epoch
+            # -------------------------------
 
             # Log to DB
             current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            log_to_db(uid, current_time)
+            log_to_db(uid_str, current_time)
 
             # Buzzer feedback
             GPIO.output(buzzer, GPIO.HIGH)
-            sleep(0.1)
+            time.sleep(0.1)
             GPIO.output(buzzer, GPIO.LOW)
-            
-            # Debounce
-            sleep(1.7)
 
     except Exception as e:
         print(f"System error: {e}")
