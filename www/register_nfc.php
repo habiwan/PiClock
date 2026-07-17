@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         die(json_encode(['status' => 'error', 'message' => 'Missing data'])); 
     }
 
-    // Normalize UID (Matching your existing logic)
+    // Normalize UID (Matching the existing logic of raw NFC to csv file from manufacturer)
     $clean_uid = "";
     foreach (explode(':', $raw_uid) as $part) { $clean_uid .= dechex(hexdec($part)); }
     
