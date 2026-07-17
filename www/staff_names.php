@@ -3,7 +3,7 @@
 session_start();
 
 // 1. CHOOSE YOUR MANAGEMENT PASSWORD HERE:
-define('MANAGEMENT_PASSWORD', '1234');
+define('MANAGEMENT_PASSWORD', 'SecurePassword');
 define('MANAGEMENT_TIMEOUT_SECONDS', 1200); // 20 min Inactivity threshold
 
 // Handle Explicit Logout
