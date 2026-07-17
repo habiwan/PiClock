@@ -13,6 +13,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $clean_uid = "";
     foreach (explode(':', $raw_uid) as $part) { $clean_uid .= dechex(hexdec($part)); }
     
+    // --- SERVER-SIDE DEBOUNCE LOGIC ---
+    $debounce_file = sys_get_temp_dir() . '/nfc_swipe_debounce_' . $clean_uid . '.txt';
+    $debounce_seconds = 60;
+    $current_time = time();
+
+    if (file_exists($debounce_file)) {
+        $last_time = (int)file_get_contents($debounce_file);
+        if (($current_time - $last_time) < $debounce_seconds) {
+            // Return a safe JSON response so the front-end doesn't crash if this catches a glitch
+            echo json_encode(['status' => 'ignored', 'name' => 'Already Logged', 'time' => date('H:i:s')]);
+            exit;
+        }
+    }
+    file_put_contents($debounce_file, $current_time);
+    // ----------------------------------
+    
     try {
         $db = new PDO("mysql:host=db;dbname=lampapp", "root", "rootpassword");
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -20,13 +36,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // --- AUTOMATIC TABLE CREATION ---
         $db->exec("CREATE TABLE IF NOT EXISTS names (
             id INT AUTO_INCREMENT PRIMARY KEY,
-            CardID VARCHAR(255) NOT NULL UNIQUE,
-            name VARCHAR(255) DEFAULT NULL
+            CardID VARCHAR(12) NOT NULL UNIQUE,
+            name VARCHAR(100) DEFAULT NULL
         )");
 
         $db->exec("CREATE TABLE IF NOT EXISTS times (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            UID VARCHAR(255) NOT NULL,
+            UID VARCHAR(12) NOT NULL,
             temp FLOAT,
             timestamp DATETIME
         )");
@@ -42,9 +57,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $name = $user['name'];
         } else {
             // Card is UNKNOWN. Auto-register it.
-            $countStmt = $db->query("SELECT COUNT(*) FROM names");
-            $total_cards = $countStmt->fetchColumn();
-            $next_id = $total_cards + 1;
+            $maxStmt = $db->query("SELECT MAX(id) FROM names");
+            $max_id = $maxStmt->fetchColumn();
+            // If the table is empty, start at 1, otherwise use the highest + 1
+            $next_id = ($max_id !== null) ? ($max_id + 1) : 1;
             
             // Format the name to zz_UNASSIGNED-XX
             $name = sprintf("zz_UNASSIGNED-%02d", $next_id);
