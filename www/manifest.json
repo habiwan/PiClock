@@ -1,7 +1,7 @@
 {
   "name": "NFC Scanner",
   "short_name": "Scanner",
-  "start_url": "scanner.html",
+  "start_url": "scanner",
   "display": "standalone",
   "background_color": "#1e3c72",
   "theme_color": "#1e3c72",
