@@ -55,7 +55,6 @@ def ensure_tables_exist(cursor):
     # Create 'times' table
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS times (
-            id INT AUTO_INCREMENT PRIMARY KEY,
             UID VARCHAR(255) NOT NULL,
             temp FLOAT,
             timestamp DATETIME
