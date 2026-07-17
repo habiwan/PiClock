@@ -220,7 +220,7 @@
         <div class="ui-overlay">
             
             <div id="startScreen">
-                <h1 class="game-title">page 404<br><br>Fly over da bro nXs</h1>
+                <h1 class="game-title">404 error<br><br>page not found</h1>
                 <div class="message">
                     Tap the screen or<br>
                     click the mouse or<br>
@@ -229,7 +229,7 @@
                 </div>
                 <button id="startButton">START GAME</button>
                 <div class="instructions">
-                    Avoid the crackpipes and<br>
+                    Avoid the pipes and<br>
                     don't hit the ground!
                 </div>
             </div>
