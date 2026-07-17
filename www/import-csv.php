@@ -16,12 +16,12 @@ try {
     // Create new names table with an auto-increment ID to maintain physical order
     $pdo->exec("CREATE TABLE names (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        CardID VARCHAR(50),
-        Name VARCHAR(100)
+        CardID VARCHAR(12) NOT NULL UNIQUE,
+        Name VARCHAR(100) DEFAULT NULL
     )");
 
     $pdo->exec("CREATE TABLE IF NOT EXISTS times (
-        UID VARCHAR(12),
+        UID VARCHAR(12) NOT NULL,
         temp FLOAT,
         timestamp DATETIME
     )");
