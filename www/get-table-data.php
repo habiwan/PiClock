@@ -104,16 +104,23 @@ foreach ($groupedData as $dayKey => $employees) {
     
     echo '<div class="day-content">';
     foreach ($employees as $empCard => $empInfo) {
-        echo '<div class="employee-row" data-name="' . htmlspecialchars(strtolower($empInfo['name'])) . '" data-card="' . htmlspecialchars(strtolower($empInfo['card'])) . '">';
-        echo '<div class="employee-info"><div class="avatar" style="' . (!$empInfo['is_matched'] ? 'background: #b0bec5;' : '') . '">' . htmlspecialchars(substr($empInfo['name'], 0, 1)) . '</div>';
+        // Updated: Removed data-card attribute
+        echo '<div class="employee-row" data-name="' . htmlspecialchars(strtolower($empInfo['name'])) . '">';
         
-        echo '<div><div>' . ($empInfo['is_matched'] ? '<span class="employee-name">' . htmlspecialchars($empInfo['name']) . '</span>' : '<span class="badge-unknown">Unknown Card</span>') . '</div>';
-        // Added 'click-id' class to the code block
-        echo '<div class="card-id-sub">ID: <code class="click-id">' . htmlspecialchars($empInfo['card']) . '</code></div></div></div>';
+        // Employee Info Section
+        echo '<div class="employee-info">';
+        echo '<div class="avatar" style="' . (!$empInfo['is_matched'] ? 'background: #b0bec5;' : '') . '">' . htmlspecialchars(substr($empInfo['name'], 0, 1)) . '</div>';
         
+        // Name/Badge Section (ID removed from here)
+        echo '<div>' . ($empInfo['is_matched'] ? '<span class="employee-name">' . htmlspecialchars($empInfo['name']) . '</span>' : '<span class="badge-unknown">Unknown Card</span>') . '</div>';
+        echo '</div>'; // Closes .employee-info
+        
+        // Punch Times Section
         echo '<div class="punch-times">';
         foreach ($empInfo['punches'] as $punch) { echo '<span class="time-badge">' . htmlspecialchars($punch) . '</span>'; }
-        echo '</div></div>';
+        echo '</div>'; // Closes .punch-times
+        
+        echo '</div>'; // Closes .employee-row
     }
     echo '</div></div>';
 }
