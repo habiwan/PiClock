@@ -31,19 +31,53 @@ db_config = {
 last_swipe_times = {}
 DEBOUNCE_SECONDS = 60
 
+def get_cpu_temp():
+    """Fetches the CPU temperature using vcgencmd."""
+    try:
+        # Standard approach for vcgencmd on Raspberry Pi
+        temp = vcgencmd.measure_temp()
+        # Returns a string like "temp=56.0'C", we need to extract the float
+        temp_value = float(temp.replace("temp=", "").replace("'C", ""))
+        return temp_value
+    except:
+        return 0.0 # Fallback if reading fails
+
+def ensure_tables_exist(cursor):
+    """Creates tables if they are missing."""
+    # Create 'names' table
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS names (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            CardID VARCHAR(255) NOT NULL UNIQUE,
+            name VARCHAR(255) DEFAULT NULL
+        )
+    """)
+    # Create 'times' table
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS times (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            UID VARCHAR(255) NOT NULL,
+            temp FLOAT,
+            timestamp DATETIME
+        )
+    """)
+
 def log_to_db(uid_str, timestamp):
-    """Inserts the swipe event directly into MySQL."""
     try:
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor()
         
-        sql = "INSERT INTO times (UID, timestamp) VALUES (%s, %s)"
-        cursor.execute(sql, (uid_str, timestamp))
+        # --- NEW: Ensure structure exists before inserting ---
+        ensure_tables_exist(cursor)
+        
+        cpu_temp = get_cpu_temp()
+        
+        sql = "INSERT INTO times (UID, temp, timestamp) VALUES (%s, %s, %s)"
+        cursor.execute(sql, (uid_str, cpu_temp, timestamp))
         
         conn.commit()
         cursor.close()
         conn.close()
-        print(f"Successfully logged {uid_str} to database.")
     except mysql.connector.Error as err:
         print(f"Database error: {err}")
 
