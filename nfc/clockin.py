@@ -48,14 +48,14 @@ def ensure_tables_exist(cursor):
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS names (
             id INT AUTO_INCREMENT PRIMARY KEY,
-            CardID VARCHAR(255) NOT NULL UNIQUE,
-            name VARCHAR(255) DEFAULT NULL
+            CardID VARCHAR(12) NOT NULL UNIQUE,
+            name VARCHAR(100) DEFAULT NULL
         )
     """)
     # Create 'times' table
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS times (
-            UID VARCHAR(255) NOT NULL,
+            UID VARCHAR(12) NOT NULL,
             temp FLOAT,
             timestamp DATETIME
         )
